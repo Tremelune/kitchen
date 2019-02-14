@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import wtf.benedict.kitchen.biz.Order;
 import wtf.benedict.kitchen.biz.Order.Temperature;
+import wtf.benedict.kitchen.biz.OrderIdGenerator;
 
 @AllArgsConstructor
 class OrderLoader {
@@ -27,10 +28,12 @@ class OrderLoader {
   private final Iterator<Order> orders = loadOrders();
 
   private final Clock clock;
+  private final OrderIdGenerator orderIdGenerator;
 
 
   Order next() {
     val order = orders.next();
+    order.setId(orderIdGenerator.next());
     order.setReceived(clock.instant());
     return order;
   }

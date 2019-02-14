@@ -6,6 +6,7 @@ import static wtf.benedict.kitchen.biz.Order.Temperature.FROZEN;
 import org.junit.Test;
 
 import lombok.val;
+import wtf.benedict.kitchen.biz.OrderIdGenerator;
 import wtf.benedict.kitchen.test.TestUtil;
 
 public class OrderLoaderTest {
@@ -13,10 +14,11 @@ public class OrderLoaderTest {
   public void next() {
     val clock = TestUtil.clock(2019, 1, 1, 1, 1, 1);
 
-    val underTest = new OrderLoader(clock);
+    val underTest = new OrderLoader(clock, new OrderIdGenerator());
 
     val order = underTest.next();
 
+    assertEquals(1, order.getId());
     assertEquals("Banana Split", order.getName());
     assertEquals(FROZEN, order.getTemp());
     assertEquals(20, order.getShelfLife());

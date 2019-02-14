@@ -27,6 +27,7 @@ public class Order {
   }
 
 
+  private long id;
   private String name;
   private Temperature temp;
   private int shelfLife; // In seconds.
