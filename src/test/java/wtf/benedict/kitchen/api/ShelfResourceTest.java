@@ -1,4 +1,4 @@
-package wtf.benedict.box.api;
+package wtf.benedict.kitchen.api;
 
 import static org.junit.Assert.assertEquals;
 

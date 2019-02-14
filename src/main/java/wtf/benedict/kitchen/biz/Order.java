@@ -1,5 +1,6 @@
-package wtf.benedict.box.data;
+package wtf.benedict.kitchen.biz;
 
+import java.time.Instant;
 import java.util.Arrays;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,8 @@ public class Order {
 
 
   private String name;
-  private Temperature temperature;
+  private Temperature temp;
   private int shelfLife; // In seconds.
-  private float decayRate;
+  private double decayRate;
+  private Instant received;
 }

@@ -1,8 +1,9 @@
-package wtf.benedict.box.api;
+package wtf.benedict.kitchen.api;
 
 import static com.google.gson.stream.JsonToken.NULL;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -12,10 +13,12 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.box.data.Order;
-import wtf.benedict.box.data.Order.Temperature;
+import wtf.benedict.kitchen.biz.Order;
+import wtf.benedict.kitchen.biz.Order.Temperature;
 
+@AllArgsConstructor
 class OrderLoader {
   private static final Gson gson = new GsonBuilder()
       .registerTypeAdapter(Temperature.class, new TemperatureAdapter())
@@ -23,9 +26,13 @@ class OrderLoader {
 
   private final Iterator<Order> orders = loadOrders();
 
+  private final Clock clock;
+
 
   Order next() {
-    return orders.next();
+    val order = orders.next();
+    order.setReceived(clock.instant());
+    return order;
   }
 
 
@@ -36,7 +43,8 @@ class OrderLoader {
 
 
   // Java makes it hard to use enum values for serialization, and easy to use the fragile enum
-  // names, so we jump a hoop.
+  // names, so we jump a hoop:
+  //
   // https://stackoverflow.com/questions/8863429/how-to-handle-a-numberformatexception-with-gson-in-deserialization-a-json-respon
   private static class TemperatureAdapter extends TypeAdapter<Temperature> {
     @Override

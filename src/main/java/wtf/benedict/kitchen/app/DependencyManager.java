@@ -1,6 +1,6 @@
-package wtf.benedict.box.app;
+package wtf.benedict.kitchen.app;
 
-import wtf.benedict.box.api.ShelfResource;
+import wtf.benedict.kitchen.api.ShelfResource;
 
 /** Guice with no Guice. */
 class DependencyManager {

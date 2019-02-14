@@ -1,4 +1,4 @@
-package wtf.benedict.box.app;
+package wtf.benedict.kitchen.app;
 
 import java.util.TimeZone;
 

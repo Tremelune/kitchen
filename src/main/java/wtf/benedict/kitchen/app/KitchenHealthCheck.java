@@ -1,4 +1,4 @@
-package wtf.benedict.box.app;
+package wtf.benedict.kitchen.app;
 
 import com.codahale.metrics.health.HealthCheck;
 
