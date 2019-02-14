@@ -1,0 +1,15 @@
+.idea
+/.metadata/
+/.recommenders/
+/**/.project
+/**/.classpath
+/**/.settings
+/**/app-local.properties
+/**/target/
+/*/bin/
+*.orig
+*.iml
+*.ipr
+*.iws
+.DS_Store
+*.factorypath
