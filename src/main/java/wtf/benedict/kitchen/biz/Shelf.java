@@ -32,8 +32,12 @@ class Shelf {
 
 
   Order get(long id) {
-    System.out.println();
     return idToOrder.get(id);
+  }
+
+
+  void remove(long id) {
+    idToOrder.remove(id);
   }
 
 
