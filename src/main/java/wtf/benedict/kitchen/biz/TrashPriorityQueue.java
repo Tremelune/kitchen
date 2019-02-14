@@ -41,8 +41,8 @@ class TrashPriorityQueue {
 
   private static Comparator<Order> newDecayComparator(Clock clock) {
     return (a, b) -> {
-      val shelfLifeA = DecayUtil.getRemainingShelfLife(clock, a);
-      val shelfLifeB = DecayUtil.getRemainingShelfLife(clock, b);
+      val shelfLifeA = DecayUtil.getRemainingShelfLife(clock, a, 1); // TODO Modifier.
+      val shelfLifeB = DecayUtil.getRemainingShelfLife(clock, b, 1);
       return Long.compare(shelfLifeA, shelfLifeB);
     };
   }
