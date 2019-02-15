@@ -23,7 +23,8 @@ class OverflowShelf {
   private final Clock clock;
 
   // The overflow shelf has a capacity that is spread across several order queues, so we keep track
-  // of the "size" of the shelf manually.
+  // of the true "size" of the shelf manually. This lets us fill up with orders of a single temp
+  // while also limiting us to the specified capacity.
   private int size;
 
 
@@ -37,28 +38,35 @@ class OverflowShelf {
   }
 
 
-  void put(Temperature temp, Order order) throws StaleOrderException {
+  void put(Order order) throws StaleOrderException {
     if (size < capacity) {
-      try {
-        queues.get(temp).put(order, 1); // TODO Why do we have this decay rate multiplier here...?
-        size++;
-      } catch (OverflowException e) {
-        fatalOverflow(order);
-      }
+      enqueuOrder(order);
     } else {
       val stalestOrder = getStalest(order);
       if (stalestOrder.getId() == order.getId()) {
         throw new StaleOrderException(order);
       }
 
-      // Make space for this new order by discarding the stalest order on the shelf.
-      val queue = queues.get(stalestOrder.getTemp());
-      queue.pull(); // Remove one.
-      try {
-        queue.put(order, 1); // TODO: Ditto, figure this out.
-      } catch (OverflowException e) {
-        fatalOverflow(order);
-      }
+      // Make space and add the new order.
+      pull(stalestOrder.getTemp()); // Discard stalest order. Happy birthday TO THE GROUND!
+      enqueuOrder(order);
+    }
+  }
+
+
+  Order pull(Temperature temp) {
+    val order = queues.get(temp).pull();
+    size--;
+    return order;
+  }
+
+
+  private void enqueuOrder(Order order) {
+    try {
+      queues.get(order.getTemp()).put(order, 1); // TODO Why do we have this decay rate multiplier here...?
+      size++;
+    } catch (OverflowException e) {
+      fatalOverflow(order);
     }
   }
 
