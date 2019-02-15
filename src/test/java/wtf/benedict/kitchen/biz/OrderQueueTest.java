@@ -48,6 +48,38 @@ public class OrderQueueTest {
 
 
   @Test(expected = OverflowException.class)
+  public void pull_byId() throws Exception {
+    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
+
+    val freshOrder = Order.builder()
+        .id(10)
+        .name("fresh")
+        .decayRate(1)
+        .shelfLife(2)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    val staleOrder = Order.builder()
+        .id(11)
+        .name("stale")
+        .decayRate(1)
+        .shelfLife(1)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    val underTest = new OrderQueue(clock, 1, 1);
+    underTest.put(staleOrder, 1);
+    underTest.put(freshOrder, 1);
+
+    assertNull(underTest.pull(1337)); // Never existed...
+    assertEquals("fresh", underTest.pull(10).getName());
+    assertNull(underTest.pull(10));
+    assertEquals("stale", underTest.pull(11).getName());
+    assertNull(underTest.pull(11));
+  }
+
+
+  @Test(expected = OverflowException.class)
   public void peek() throws Exception {
     val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
 
