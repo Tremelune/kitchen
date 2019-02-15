@@ -4,9 +4,6 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.time.Clock;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -17,24 +14,24 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 
 // TODO Instant notification of eviction.
-// TODO Pull by ID.
-// TODO Test.
 class StaleQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
-  private final Map<Long, DecoratedOrder> sortedOrdersMap;
   private final SortedSet<DecoratedOrder> sortedOrders;
 
   private final int capacity;
 
 
   StaleQueue(Clock clock, int capacity, double decayRateMultiplier) {
+    if (capacity < 1) {
+      throw new IllegalArgumentException("Capacity must be positive!");
+    }
+
     this.capacity = capacity;
 
     val expirationPolicy = newExpirationPolicy(clock, decayRateMultiplier);
     freshOrders = new PassiveExpiringMap<>(expirationPolicy);
 
     sortedOrders = new TreeSet<>(newDecayComparator(clock));
-    sortedOrdersMap = new HashMap<>();
   }
 
 
@@ -46,7 +43,6 @@ class StaleQueue {
     val decoratedOrder = new DecoratedOrder(order, decayRateMultiplier);
     freshOrders.put(order.getId(), order);
     sortedOrders.add(decoratedOrder);
-    sortedOrdersMap.put(order.getId(), decoratedOrder);
   }
 
 
@@ -61,30 +57,47 @@ class StaleQueue {
   }
 
 
+  // TODO Test.
+  Order pull(long orderId) {
+    val order = freshOrders.get(orderId);
+    removeOrder(orderId);
+    return order;
+  }
+
+
   // Gets the stalest order.
   private Order get(boolean isPull) {
     while (isNotEmpty(sortedOrders)) {
-      // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stinkiest
+      // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stalest
       // until we find something or the set is exhausted.
-      val stinkiestOrder = sortedOrders.last();
-      val order = freshOrders.get(stinkiestOrder.order.getId());
+      val stalestOrder = sortedOrders.first();
+      val order = freshOrders.get(stalestOrder.order.getId());
       if (order != null) {
-        // We found the stinkiest order, so remove it to complete the "pull"...unless we're peeking.
+        // We found the stalest order, so remove it to complete the "pull"...unless we're peeking.
         if (isPull) {
-          freshOrders.remove(order.getId());
-          sortedOrders.remove(stinkiestOrder);
-          sortedOrdersMap.remove(order.getId());
+          removeOrder(order.getId());
         }
         return order;
       }
 
-      // This order was evicted, so remove it from the set and tell the world.
-      sortedOrders.remove(stinkiestOrder);
-      sendEvictionNotification(stinkiestOrder.order.getId());
+      // This order has been evicted, so remove it from the sorted set and tell the world.
+      removeOrder(stalestOrder.order.getId());
+      sendEvictionNotification(stalestOrder.order.getId());
     }
 
     // No orders...We out.
     return null;
+  }
+
+
+  private void removeOrder(long orderId) {
+    val orderToRemove = sortedOrders.stream()
+        .filter((order) -> order.order.getId() == orderId)
+        .findFirst()
+        .orElse(null);
+
+    freshOrders.remove(orderId);
+    sortedOrders.remove(orderToRemove);
   }
 
 
@@ -119,21 +132,6 @@ class StaleQueue {
   private static class DecoratedOrder {
     private final Order order;
     private final double decayRateMultiplier;
-
-    // Somewhat generated code. As Orders are entities, we can rely on their IDs for uniqueness.
-    // TODO Do we need this?
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      DecoratedOrder that = (DecoratedOrder) o;
-      return order.getId() == that.order.getId();
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(order);
-    }
   }
 
 
