@@ -86,4 +86,18 @@ public class DecayUtilTest {
 
     assertEquals(0, DecayUtil.getRemainingShelfLife(clock, order, 1));
   }
+
+
+  @Test(expected = IllegalArgumentException.class)
+  public void confirmThatTheArrowOfTimeIsUnidirectional() {
+    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
+
+    val order = Order.builder()
+        .shelfLife(10)
+        .decayRate(1)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 1)) // The future
+        .build();
+
+    assertEquals(0, DecayUtil.getRemainingShelfLife(clock, order, 1));
+  }
 }

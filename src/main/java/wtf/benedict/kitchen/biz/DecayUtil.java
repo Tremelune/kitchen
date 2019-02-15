@@ -13,7 +13,6 @@ class DecayUtil {
     double decayRate = order.getDecayRate() * decayRateMultiplier;
     double decaySeconds = decayDuration.getSeconds() * decayRate;
 
-    // TODO Test.
     if (decaySeconds < 0) {
       throw new IllegalArgumentException("Time is a directed arrow!");
     }
