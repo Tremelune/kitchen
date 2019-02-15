@@ -48,14 +48,21 @@ class OverflowShelf {
       }
 
       // Make space and add the new order.
-      pull(stalestOrder.getTemp()); // Discard stalest order. Happy birthday TO THE GROUND!
+      pullStalest(stalestOrder.getTemp()); // Discard stalest order. Happy birthday TO THE GROUND!
       enqueuOrder(order);
     }
   }
 
 
-  Order pull(Temperature temp) {
+  Order pullStalest(Temperature temp) {
     val order = queues.get(temp).pull();
+    size--;
+    return order;
+  }
+
+
+  Order pull(Temperature temp, long orderId) {
+    val order = queues.get(temp).pull(orderId);
     size--;
     return order;
   }

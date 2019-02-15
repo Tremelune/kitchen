@@ -13,6 +13,34 @@ import wtf.benedict.kitchen.test.TestUtil;
 
 public class OverflowShelfTest {
   @Test
+  public void pull_byOrderId() throws Exception {
+    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
+    val underTest = new OverflowShelf(2, clock);
+
+    val freshOrder = Order.builder()
+        .id(10)
+        .temp(HOT)
+        .shelfLife(100)
+        .decayRate(1)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    val staleOrder = Order.builder()
+        .id(11)
+        .temp(COLD)
+        .shelfLife(10)
+        .decayRate(1)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    // Push and pull a few to make sure the size is tracked accurately.
+    underTest.put(freshOrder);
+    underTest.put(staleOrder);
+    assertEquals(freshOrder, underTest.pull(HOT, 10));
+  }
+
+
+  @Test
   public void pushAndPullShouldTrackSize() throws Exception {
     val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
     val underTest = new OverflowShelf(1, clock);
@@ -35,14 +63,14 @@ public class OverflowShelfTest {
 
     // Push and pull a few to make sure the size is tracked accurately.
     underTest.put(freshOrder);
-    assertEquals(freshOrder, underTest.pull(freshOrder.getTemp()));
-    assertNull(underTest.pull(freshOrder.getTemp()));
+    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    assertNull(underTest.pull(HOT, 10));
     underTest.put(staleOrder);
-    assertEquals(staleOrder, underTest.pull(staleOrder.getTemp()));
+    assertEquals(staleOrder, underTest.pullStalest(COLD));
     underTest.put(freshOrder);
     underTest.put(staleOrder);
-    assertEquals(freshOrder, underTest.pull(freshOrder.getTemp()));
-    assertNull(underTest.pull(freshOrder.getTemp()));
+    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    assertNull(underTest.pullStalest(HOT));
   }
 
 
@@ -96,7 +124,7 @@ public class OverflowShelfTest {
     underTest.put(staleOrder);
     underTest.put(freshOrder);
 
-    assertEquals(freshOrder, underTest.pull(freshOrder.getTemp()));
-    assertNull(underTest.pull(staleOrder.getTemp()));
+    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    assertNull(underTest.pullStalest(COLD));
   }
 }
