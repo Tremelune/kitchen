@@ -14,14 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 
 // TODO Instant notification of eviction.
-class StaleQueue {
+class OrderQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
   private final SortedSet<DecoratedOrder> sortedOrders;
 
   private final int capacity;
 
 
-  StaleQueue(Clock clock, int capacity, double decayRateMultiplier) {
+  OrderQueue(Clock clock, int capacity, double decayRateMultiplier) {
     if (capacity < 1) {
       throw new IllegalArgumentException("Capacity must be positive!");
     }

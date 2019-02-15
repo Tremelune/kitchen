@@ -6,14 +6,14 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.StaleQueue.OverflowException;
+import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 import wtf.benedict.kitchen.test.TestUtil;
 
-public class StaleQueueTest {
+public class OrderQueueTest {
   @Test(expected = OverflowException.class)
   public void add_capacityCheck() throws Exception {
     val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
-    val underTest = new StaleQueue(clock, 1, 1);
+    val underTest = new OrderQueue(clock, 1, 1);
     underTest.put(newOrder(), 1);
     underTest.put(newOrder(), 1);
   }
@@ -37,7 +37,7 @@ public class StaleQueueTest {
         .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
         .build();
 
-    val underTest = new StaleQueue(clock, 1, 1);
+    val underTest = new OrderQueue(clock, 1, 1);
     underTest.put(freshOrder, 1);
     underTest.put(staleOrder, 1);
 
@@ -65,7 +65,7 @@ public class StaleQueueTest {
         .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
         .build();
 
-    val underTest = new StaleQueue(clock, 1, 1);
+    val underTest = new OrderQueue(clock, 1, 1);
     underTest.put(staleOrder, 1);
     underTest.put(freshOrder, 1);
 
@@ -111,7 +111,7 @@ public class StaleQueueTest {
         .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
         .build();
 
-    val underTest = new StaleQueue(clock, 4, 1);
+    val underTest = new OrderQueue(clock, 4, 1);
     underTest.put(freshOrder, 1);
     underTest.put(fastDecayOrder, 1);
     underTest.put(staleOrder, 1);
@@ -144,7 +144,7 @@ public class StaleQueueTest {
         .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
         .build();
 
-    val underTest = new StaleQueue(clock, 2, 1);
+    val underTest = new OrderQueue(clock, 2, 1);
     underTest.put(stale, 1);
     underTest.put(fresh, 1);
 
