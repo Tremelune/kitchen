@@ -8,12 +8,12 @@ import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.collections4.map.PassiveExpiringMap.ExpirationPolicy;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.StaleSet.DecoratedOrder;
+import wtf.benedict.kitchen.biz.StaleOrderSet.DecoratedOrder;
 
 // TODO Instant notification of eviction.
 class OrderQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
-  private final StaleSet sortedOrders;
+  private final StaleOrderSet sortedOrders;
 
   private final int capacity;
 
@@ -28,7 +28,7 @@ class OrderQueue {
     val expirationPolicy = newExpirationPolicy(clock, decayRateMultiplier);
     freshOrders = new PassiveExpiringMap<>(expirationPolicy);
 
-    sortedOrders = new StaleSet(clock);
+    sortedOrders = new StaleOrderSet(clock);
   }
 
 

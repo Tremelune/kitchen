@@ -8,8 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 
-class StaleSet extends TreeSet<StaleSet.DecoratedOrder> {
-  StaleSet(Clock clock) {
+class StaleOrderSet extends TreeSet<StaleOrderSet.DecoratedOrder> {
+  StaleOrderSet(Clock clock) {
     super(newDecayComparator(clock));
   }
 
