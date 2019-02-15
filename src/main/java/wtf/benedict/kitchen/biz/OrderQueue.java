@@ -3,20 +3,17 @@ package wtf.benedict.kitchen.biz;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.time.Clock;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.collections4.map.PassiveExpiringMap.ExpirationPolicy;
 
-import lombok.AllArgsConstructor;
 import lombok.val;
+import wtf.benedict.kitchen.biz.StaleSet.DecoratedOrder;
 
 // TODO Instant notification of eviction.
 class OrderQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
-  private final SortedSet<DecoratedOrder> sortedOrders;
+  private final StaleSet sortedOrders;
 
   private final int capacity;
 
@@ -31,7 +28,7 @@ class OrderQueue {
     val expirationPolicy = newExpirationPolicy(clock, decayRateMultiplier);
     freshOrders = new PassiveExpiringMap<>(expirationPolicy);
 
-    sortedOrders = new TreeSet<>(newDecayComparator(clock));
+    sortedOrders = new StaleSet(clock);
   }
 
 
@@ -71,7 +68,7 @@ class OrderQueue {
       // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stalest
       // until we find something or the set is exhausted.
       val stalestOrder = sortedOrders.first();
-      val order = freshOrders.get(stalestOrder.order.getId());
+      val order = freshOrders.get(stalestOrder.getOrder().getId());
       if (order != null) {
         // We found the stalest order, so remove it to complete the "pull"...unless we're peeking.
         if (isPull) {
@@ -81,8 +78,8 @@ class OrderQueue {
       }
 
       // This order has been evicted, so remove it from the sorted set and tell the world.
-      removeOrder(stalestOrder.order.getId());
-      sendEvictionNotification(stalestOrder.order.getId());
+      removeOrder(stalestOrder.getOrder().getId());
+      sendEvictionNotification(stalestOrder.getOrder().getId());
     }
 
     // No orders...We out.
@@ -92,7 +89,7 @@ class OrderQueue {
 
   private void removeOrder(long orderId) {
     val orderToRemove = sortedOrders.stream()
-        .filter((order) -> order.order.getId() == orderId)
+        .filter((order) -> order.getOrder().getId() == orderId)
         .findFirst()
         .orElse(null);
 
@@ -115,23 +112,6 @@ class OrderQueue {
       val shelfLifeMillis = shelfLife * 1000; // Convert to millis
       return System.currentTimeMillis() + shelfLifeMillis;
     };
-  }
-
-
-
-  private static Comparator<DecoratedOrder> newDecayComparator(Clock clock) {
-    return (a, b) -> {
-      val shelfLifeA = DecayUtil.getRemainingShelfLife(clock, a.order, a.decayRateMultiplier);
-      val shelfLifeB = DecayUtil.getRemainingShelfLife(clock, b.order, b.decayRateMultiplier);
-      return Long.compare(shelfLifeA, shelfLifeB);
-    };
-  }
-
-
-  @AllArgsConstructor
-  private static class DecoratedOrder {
-    private final Order order;
-    private final double decayRateMultiplier;
   }
 
 
