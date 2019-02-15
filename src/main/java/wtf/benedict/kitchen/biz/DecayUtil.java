@@ -9,9 +9,14 @@ import lombok.val;
 class DecayUtil {
   static long getRemainingShelfLife(Clock clock, Order order, double decayRateMultiplier) {
     // How long this has been sitting on a shelf
-    val decayDuration = Duration.between(clock.instant(), order.getReceived());
+    val decayDuration = Duration.between(order.getReceived(), clock.instant());
     double decayRate = order.getDecayRate() * decayRateMultiplier;
     double decaySeconds = decayDuration.getSeconds() * decayRate;
+
+    if (decaySeconds < 0) {
+      throw new IllegalArgumentException("Time is a directed arrow!");
+    }
+
     double shelfLife = order.getShelfLife() - decaySeconds;
     long shelfLifeSeconds = Math.round(shelfLife);
     return Math.max(0, shelfLifeSeconds);
