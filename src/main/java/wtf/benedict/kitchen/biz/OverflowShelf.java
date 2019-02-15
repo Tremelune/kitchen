@@ -55,7 +55,7 @@ class OverflowShelf {
 
 
   Order pullStalest(Temperature temp) {
-    val order = queues.get(temp).pull();
+    val order = queues.get(temp).pullStalest();
     size--;
     return order;
   }
@@ -99,7 +99,7 @@ class OverflowShelf {
 
   private void addStalest(StaleOrderSet orders, Temperature temp) {
     // Skip nulls.
-    val stalest = queues.get(temp).peek();
+    val stalest = queues.get(temp).peekStalest();
     if (stalest == null) {
       return;
     }

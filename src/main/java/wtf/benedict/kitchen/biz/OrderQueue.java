@@ -43,18 +43,20 @@ class OrderQueue {
   }
 
 
-  // Pulls stalest order.
-  Order pull() {
-    return get(true);
+  Order pullStalest() {
+    return get(true, true);
+  }
+
+  Order pullFreshest() {
+    return get(true, false);
   }
 
   // Gets stalest order without removing it.
-  Order peek() {
-    return get(false);
+  Order peekStalest() {
+    return get(false, true);
   }
 
 
-  // TODO Test.
   Order pull(long orderId) {
     val order = freshOrders.get(orderId);
     removeOrder(orderId);
@@ -63,12 +65,12 @@ class OrderQueue {
 
 
   // Gets the stalest order.
-  private Order get(boolean isPull) {
+  private Order get(boolean isPull, boolean findStalest) {
     while (isNotEmpty(sortedOrders)) {
       // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stalest
       // until we find something or the set is exhausted.
-      val stalestOrder = sortedOrders.first();
-      val order = freshOrders.get(stalestOrder.getOrder().getId());
+      val mostOrder = getMost(findStalest);
+      val order = freshOrders.get(mostOrder.getOrder().getId());
       if (order != null) {
         // We found the stalest order, so remove it to complete the "pull"...unless we're peeking.
         if (isPull) {
@@ -78,12 +80,18 @@ class OrderQueue {
       }
 
       // This order has been evicted, so remove it from the sorted set and tell the world.
-      removeOrder(stalestOrder.getOrder().getId());
-      sendEvictionNotification(stalestOrder.getOrder().getId());
+      removeOrder(mostOrder.getOrder().getId());
+      sendEvictionNotification(mostOrder.getOrder().getId());
     }
 
     // No orders...We out.
     return null;
+  }
+
+
+  // Get stalest or freshest
+  private DecoratedOrder getMost(boolean stale) {
+    return stale ? sortedOrders.first() : sortedOrders.last();
   }
 
 
