@@ -4,7 +4,9 @@ import static wtf.benedict.kitchen.biz.Temperature.COLD;
 import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.val;
@@ -82,16 +84,19 @@ class OverflowShelf {
 
   // Find the stalest order across all temps, including the newly-incoming order.
   private Order getStalest(Order order) {
-    // This set will order them, then just pull off the stalest.
-    val orders = new StaleOrderSet();
+    // Order them, then just pull off the stalest.
+    val orders = new ArrayList<Order>();
+    orders.add(order);
     addStalest(orders, HOT);
     addStalest(orders, COLD);
     addStalest(orders, FROZEN);
-    orders.add(order);
-    return orders.first();
+
+    orders.sort(RemainingShelfLifeComparator.INSTANCE);
+
+    return orders.iterator().next();
   }
 
-  private void addStalest(StaleOrderSet orders, Temperature temp) {
+  private void addStalest(List<Order> orders, Temperature temp) {
     // Skip nulls.
     val stalest = queues.get(temp).peekStalest();
     if (stalest == null) {

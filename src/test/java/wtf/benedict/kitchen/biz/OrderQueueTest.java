@@ -27,27 +27,30 @@ public class OrderQueueTest {
   }
 
 
-  @Test(expected = OverflowException.class)
+  @Test
   public void pullStalest() throws Exception {
-    val fresh = newOrder(10, 200);
-    val stale = newOrder(11, 100);
+    val stale = newOrder(10, 300);
+    val staler = newOrder(11, 200);
+    val stalest = newOrder(12, 100);
 
-    val underTest = new OrderQueue(1, 1);
-    underTest.put(fresh);
+    val underTest = new OrderQueue(3, 1);
+    underTest.put(staler);
+    underTest.put(stalest);
     underTest.put(stale);
 
+    assertEquals(stalest, underTest.pullStalest());
+    assertEquals(staler, underTest.pullStalest());
     assertEquals(stale, underTest.pullStalest());
-    assertEquals(fresh, underTest.pullStalest());
     assertNull(underTest.pullStalest());
   }
 
 
-  @Test(expected = OverflowException.class)
+  @Test
   public void pull_byId() throws Exception {
     val fresh = newOrder(10, 200);
     val stale = newOrder(11, 100);
 
-    val underTest = new OrderQueue(1, 1);
+    val underTest = new OrderQueue(2, 1);
     underTest.put(stale);
     underTest.put(fresh);
 
@@ -59,41 +62,16 @@ public class OrderQueueTest {
   }
 
 
-  @Test(expected = OverflowException.class)
+  @Test
   public void peek() throws Exception {
     val fresh = newOrder(10, 200);
     val stale = newOrder(12, 100);
 
-    val underTest = new OrderQueue(1, 1);
+    val underTest = new OrderQueue(2, 1);
     underTest.put(stale);
     underTest.put(fresh);
 
     assertEquals(stale, underTest.peekStalest());
-    assertEquals(stale, underTest.pullStalest());
-    assertEquals(fresh, underTest.pullStalest());
-  }
-
-
-//  @Test // TODO I think TreeSort won't do it, 'cause the sort value changes over time. Gotta sort then pull.
-  public void ordering() throws Exception {
-    val fresh = newOrder(10, 300);
-    val stale = newOrder(11, 100);
-
-    val fastDecay = new Order.Builder()
-        .clock(clock())
-        .id(12)
-        .name("fastDecay")
-        .temp(HOT)
-        .baseDecayRate(10)
-        .initialShelfLife(100)
-        .build();
-
-    val underTest = new OrderQueue(3, 1);
-    underTest.put(stale);
-    underTest.put(fastDecay);
-    underTest.put(fresh);
-
-    assertEquals(fastDecay, underTest.pullStalest());
     assertEquals(stale, underTest.pullStalest());
     assertEquals(fresh, underTest.pullStalest());
   }
