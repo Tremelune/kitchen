@@ -1,26 +1,21 @@
 package wtf.benedict.kitchen.biz;
 
-import static wtf.benedict.kitchen.biz.Order.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Order.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Order.Temperature.HOT;
+import static wtf.benedict.kitchen.biz.Temperature.COLD;
+import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
+import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
-import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.Order.Temperature;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
-import wtf.benedict.kitchen.biz.StaleOrderSet.DecoratedOrder;
 
-// TODO Gotta test more of this.
 class OverflowShelf {
   private static final int DECAY_RATE = 2;
 
   private final Map<Temperature, OrderQueue> queues = new HashMap<>();
 
   private final int capacity;
-  private final Clock clock;
 
   // The overflow shelf has a capacity that is spread across several order queues, so we keep track
   // of the true "size" of the shelf manually. This lets us fill up with orders of a single temp
@@ -28,13 +23,12 @@ class OverflowShelf {
   private int size;
 
 
-  OverflowShelf(int capacity, Clock clock) {
+  OverflowShelf(int capacity) {
     this.capacity = capacity;
-    this.clock = clock;
 
-    queues.put(HOT, new OrderQueue(clock, capacity, DECAY_RATE));
-    queues.put(COLD, new OrderQueue(clock, capacity, DECAY_RATE));
-    queues.put(FROZEN, new OrderQueue(clock, capacity, DECAY_RATE));
+    queues.put(HOT, new OrderQueue(capacity, DECAY_RATE));
+    queues.put(COLD, new OrderQueue(capacity, DECAY_RATE));
+    queues.put(FROZEN, new OrderQueue(capacity, DECAY_RATE));
   }
 
 
@@ -70,7 +64,7 @@ class OverflowShelf {
 
   private void enqueuOrder(Order order) {
     try {
-      queues.get(order.getTemp()).put(order, 1); // TODO Why do we have this decay rate multiplier here...?
+      queues.get(order.getTemp()).put(order);
       size++;
     } catch (OverflowException e) {
       fatalOverflow(order);
@@ -89,12 +83,12 @@ class OverflowShelf {
   // Find the stalest order across all temps, including the newly-incoming order.
   private Order getStalest(Order order) {
     // This set will order them, then just pull off the stalest.
-    val orders = new StaleOrderSet(clock);
+    val orders = new StaleOrderSet();
     addStalest(orders, HOT);
     addStalest(orders, COLD);
     addStalest(orders, FROZEN);
-    orders.add(decorate(order));
-    return orders.first().getOrder();
+    orders.add(order);
+    return orders.first();
   }
 
   private void addStalest(StaleOrderSet orders, Temperature temp) {
@@ -104,11 +98,7 @@ class OverflowShelf {
       return;
     }
 
-    orders.add(decorate(stalest));
-  }
-
-  private static DecoratedOrder decorate(Order order) {
-    return new DecoratedOrder(order, DECAY_RATE);
+    orders.add(stalest);
   }
 
 

@@ -2,44 +2,42 @@ package wtf.benedict.kitchen.biz;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
-import java.time.Clock;
+import java.util.Comparator;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.collections4.map.PassiveExpiringMap.ExpirationPolicy;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.StaleOrderSet.DecoratedOrder;
 
 // TODO Instant notification of eviction.
+// TODO Calculate shelf life with proposed rate change in mind.
 class OrderQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
-  private final StaleOrderSet sortedOrders;
+  private final StaleOrderSet sortedOrders = new StaleOrderSet();
 
   private final int capacity;
+  private final double decayRateMultiplier;
 
 
-  OrderQueue(Clock clock, int capacity, double decayRateMultiplier) {
+  OrderQueue(int capacity, double decayRateMultiplier) {
     if (capacity < 1) {
       throw new IllegalArgumentException("Capacity must be positive!");
     }
 
     this.capacity = capacity;
-
-    val expirationPolicy = newExpirationPolicy(clock, decayRateMultiplier);
-    freshOrders = new PassiveExpiringMap<>(expirationPolicy);
-
-    sortedOrders = new StaleOrderSet(clock);
+    this.decayRateMultiplier = decayRateMultiplier;
+    freshOrders = new PassiveExpiringMap<>(newExpirationPolicy());
   }
 
 
-  void put(Order order, double decayRateMultiplier) throws OverflowException {
+  void put(Order order) throws OverflowException {
     if (freshOrders.size() >= capacity) {
       throw new OverflowException(capacity);
     }
 
-    val decoratedOrder = new DecoratedOrder(order, decayRateMultiplier);
     freshOrders.put(order.getId(), order);
-    sortedOrders.add(decoratedOrder);
+    sortedOrders.add(order);
+    order.changeDecayRate(decayRateMultiplier);
   }
 
 
@@ -71,7 +69,7 @@ class OrderQueue {
       // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stalest
       // until we find something or the set is exhausted.
       val mostOrder = getMost(findStalest);
-      val order = freshOrders.get(mostOrder.getOrder().getId());
+      val order = freshOrders.get(mostOrder.getId());
       if (order != null) {
         // We found the stalest order, so remove it to complete the "pull"...unless we're peeking.
         if (isPull) {
@@ -81,8 +79,8 @@ class OrderQueue {
       }
 
       // This order has been evicted, so remove it from the sorted set and tell the world.
-      removeOrder(mostOrder.getOrder().getId());
-      sendEvictionNotification(mostOrder.getOrder().getId());
+      removeOrder(mostOrder.getId());
+      sendEvictionNotification(mostOrder.getId());
     }
 
     // No orders...We out.
@@ -91,14 +89,14 @@ class OrderQueue {
 
 
   // Get stalest or freshest
-  private DecoratedOrder getMost(boolean stale) {
+  private Order getMost(boolean stale) {
     return stale ? sortedOrders.first() : sortedOrders.last();
   }
 
 
   private void removeOrder(long orderId) {
     val orderToRemove = sortedOrders.stream()
-        .filter((order) -> order.getOrder().getId() == orderId)
+        .filter((order) -> order.getId() == orderId)
         .findFirst()
         .orElse(null);
 
@@ -112,15 +110,17 @@ class OrderQueue {
   }
 
 
-  private static ExpirationPolicy<Long, Order> newExpirationPolicy(
-      Clock clock, double decayRateMultiplier) {
-
-    // Return must be in the future. PassiveExpiringMap uses system time, an thus so must we here...
+  private static ExpirationPolicy<Long, Order> newExpirationPolicy() {
     return (ExpirationPolicy<Long, Order>) (id, order) -> {
-      val shelfLife = DecayUtil.getRemainingShelfLife(clock, order, decayRateMultiplier);
-      val shelfLifeMillis = shelfLife * 1000; // Convert to millis
+      val shelfLifeMillis = order.calculateRemainingShelfLife() * 1000; // Convert to millis
+
+      // PassiveExpiringMap uses system time, an thus so must we here...
       return System.currentTimeMillis() + shelfLifeMillis;
     };
+  }
+
+  private static Comparator<Order> newRemainingShelfLifeComparator() {
+    return Comparator.comparingLong(Order::calculateRemainingShelfLife);
   }
 
 

@@ -2,8 +2,12 @@ package wtf.benedict.kitchen.biz;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static wtf.benedict.kitchen.biz.Order.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Order.Temperature.HOT;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static wtf.benedict.kitchen.biz.Temperature.COLD;
+import static wtf.benedict.kitchen.biz.Temperature.HOT;
+
+import java.time.Clock;
 
 import org.junit.Test;
 
@@ -14,117 +18,82 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class OverflowShelfTest {
   @Test
   public void pull_byOrderId() throws Exception {
-    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
-    val underTest = new OverflowShelf(2, clock);
+    val underTest = new OverflowShelf(2);
 
-    val freshOrder = Order.builder()
-        .id(10)
-        .temp(HOT)
-        .shelfLife(100)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
+    val fresh = newOrder(10, HOT, 200);
+    val stale = newOrder(11, COLD, 100);
 
-    val staleOrder = Order.builder()
-        .id(11)
-        .temp(COLD)
-        .shelfLife(10)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
-
-    // Push and pull a few to make sure the size is tracked accurately.
-    underTest.put(freshOrder);
-    underTest.put(staleOrder);
-    assertEquals(freshOrder, underTest.pull(HOT, 10));
+    underTest.put(fresh);
+    underTest.put(stale);
+    assertEquals(fresh, underTest.pull(HOT, 10));
   }
 
 
   @Test
   public void pushAndPullShouldTrackSize() throws Exception {
-    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
-    val underTest = new OverflowShelf(1, clock);
+    val underTest = new OverflowShelf(1);
 
-    val freshOrder = Order.builder()
-        .id(10)
-        .temp(HOT)
-        .shelfLife(100)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
-
-    val staleOrder = Order.builder()
-        .id(11)
-        .temp(COLD)
-        .shelfLife(10)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
+    val fresh = newOrder(10, HOT, 200);
+    val stale = newOrder(11, COLD, 100);
 
     // Push and pull a few to make sure the size is tracked accurately.
-    underTest.put(freshOrder);
-    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    underTest.put(fresh);
+    assertEquals(fresh, underTest.pullStalest(HOT));
     assertNull(underTest.pull(HOT, 10));
-    underTest.put(staleOrder);
-    assertEquals(staleOrder, underTest.pullStalest(COLD));
-    underTest.put(freshOrder);
-    underTest.put(staleOrder);
-    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    underTest.put(stale);
+    assertEquals(stale, underTest.pullStalest(COLD));
+    underTest.put(fresh);
+    underTest.put(stale);
+    assertEquals(fresh, underTest.pullStalest(HOT));
     assertNull(underTest.pullStalest(HOT));
   }
 
 
   @Test(expected = StaleOrderException.class)
   public void overflowShouldRejectNewOrderIfItsStalest() throws Exception {
-    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
-    val underTest = new OverflowShelf(1, clock);
+    val underTest = new OverflowShelf(1);
 
-    val freshOrder = Order.builder()
-        .id(10)
-        .temp(HOT)
-        .shelfLife(100)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
+    val fresh = newOrder(10, HOT, 200);
+    val stale = newOrder(11, COLD, 100);
 
-    val staleOrder = Order.builder()
-        .id(11)
-        .temp(COLD)
-        .shelfLife(10)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
-
-    underTest.put(freshOrder);
-    underTest.put(staleOrder);
+    underTest.put(fresh);
+    underTest.put(stale);
   }
 
 
   @Test
   public void overflowShouldDiscardStalest() throws Exception {
-    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 1);
-    val underTest = new OverflowShelf(1, clock);
+    val underTest = new OverflowShelf(1);
 
-    val freshOrder = Order.builder()
-        .id(10)
-        .temp(HOT)
-        .shelfLife(100)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
+    val fresh = newOrder(10, HOT, 200);
+    val stale = newOrder(11, COLD, 100);
 
-    val staleOrder = Order.builder()
-        .id(11)
-        .temp(COLD)
-        .shelfLife(10)
-        .decayRate(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
+    underTest.put(stale);
+    underTest.put(fresh);
 
-    underTest.put(staleOrder);
-    underTest.put(freshOrder);
-
-    assertEquals(freshOrder, underTest.pullStalest(HOT));
+    assertEquals(fresh, underTest.pullStalest(HOT));
     assertNull(underTest.pullStalest(COLD));
+  }
+
+
+  private static Order newOrder(long id, Temperature temp, int initialShelfLife) {
+    return new Order.Builder()
+        .clock(clock())
+        .id(id)
+        .name("name")
+        .temp(temp)
+        .baseDecayRate(1)
+        .initialShelfLife(initialShelfLife)
+        .build();
+  }
+
+
+  private static Clock clock() {
+    val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
+    val two = TestUtil.instant(2019, 1, 1, 0, 0, 1);
+
+    val clock = mock(Clock.class);
+    when(clock.instant()).thenReturn(one, two);
+    return clock;
   }
 }
