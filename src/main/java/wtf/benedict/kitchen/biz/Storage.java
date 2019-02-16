@@ -11,9 +11,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
-// TODO Dispatch and cancel drivers.
-// TODO Move overflow stuff when stuff is evicted from temp shelves.
-// TODO Per-order decay strategy.
 class Storage {
   private static final int TEMPERATURE_SHELF_CAPACITY = 15;
   private static final int OVERFLOW_CAPACITY = 20;
