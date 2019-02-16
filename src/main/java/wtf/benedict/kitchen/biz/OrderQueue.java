@@ -1,45 +1,41 @@
 package wtf.benedict.kitchen.biz;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
-import java.time.Clock;
+import java.util.ArrayList;
 
 import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.apache.commons.collections4.map.PassiveExpiringMap.ExpirationPolicy;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.StaleOrderSet.DecoratedOrder;
 
-// TODO Instant notification of eviction.
+// TODO Notification of eviction.
+// TODO Calculate shelf life with proposed rate change in mind.
 class OrderQueue {
   private final PassiveExpiringMap<Long, Order> freshOrders;
-  private final StaleOrderSet sortedOrders;
 
   private final int capacity;
+  private final double decayRateMultiplier;
 
 
-  OrderQueue(Clock clock, int capacity, double decayRateMultiplier) {
+  OrderQueue(int capacity, double decayRateMultiplier) {
     if (capacity < 1) {
       throw new IllegalArgumentException("Capacity must be positive!");
     }
 
     this.capacity = capacity;
-
-    val expirationPolicy = newExpirationPolicy(clock, decayRateMultiplier);
-    freshOrders = new PassiveExpiringMap<>(expirationPolicy);
-
-    sortedOrders = new StaleOrderSet(clock);
+    this.decayRateMultiplier = decayRateMultiplier;
+    freshOrders = new PassiveExpiringMap<>(newExpirationPolicy());
   }
 
 
-  void put(Order order, double decayRateMultiplier) throws OverflowException {
+  void put(Order order) throws OverflowException {
     if (freshOrders.size() >= capacity) {
       throw new OverflowException(capacity);
     }
 
-    val decoratedOrder = new DecoratedOrder(order, decayRateMultiplier);
     freshOrders.put(order.getId(), order);
-    sortedOrders.add(decoratedOrder);
+    order.changeDecayRate(decayRateMultiplier);
   }
 
 
@@ -60,65 +56,43 @@ class OrderQueue {
 
   Order pull(long orderId) {
     val order = freshOrders.get(orderId);
-    removeOrder(orderId);
+    freshOrders.remove(orderId);
     return order;
   }
 
 
-  // Gets the stalest order.
-  private Order get(boolean isPull, boolean findStalest) {
-    while (isNotEmpty(sortedOrders)) {
-      // If this order isn't in idToOrder, it was likely evicted, so keep getting the next stalest
-      // until we find something or the set is exhausted.
-      val mostOrder = getMost(findStalest);
-      val order = freshOrders.get(mostOrder.getOrder().getId());
-      if (order != null) {
-        // We found the stalest order, so remove it to complete the "pull"...unless we're peeking.
-        if (isPull) {
-          removeOrder(order.getId());
-        }
-        return order;
-      }
-
-      // This order has been evicted, so remove it from the sorted set and tell the world.
-      removeOrder(mostOrder.getOrder().getId());
-      sendEvictionNotification(mostOrder.getOrder().getId());
+  // Gets the stalest order. Synchronized to ensure nothing is removed mid-loop by another process.
+  private synchronized Order get(boolean isPull, boolean findStalest) {
+    if (isEmpty(freshOrders.keySet())) {
+      return null;
     }
 
-    // No orders...We out.
-    return null;
+    val order = getMost(findStalest);
+    if (isPull) {
+      freshOrders.remove(order.getId());
+    }
+    return order;
   }
 
 
-  // Get stalest or freshest
-  private DecoratedOrder getMost(boolean stale) {
-    return stale ? sortedOrders.first() : sortedOrders.last();
+  // Get stalest or freshest. If freshOrders is empty, this will explode.
+  private Order getMost(boolean stale) {
+    val comparator = stale
+        ? RemainingShelfLifeComparator.INSTANCE
+        : RemainingShelfLifeComparator.INSTANCE.reversed();
+
+    val orders = new ArrayList<Order>(freshOrders.values());
+    orders.sort(comparator);
+
+    return orders.iterator().next();
   }
 
 
-  private void removeOrder(long orderId) {
-    val orderToRemove = sortedOrders.stream()
-        .filter((order) -> order.getOrder().getId() == orderId)
-        .findFirst()
-        .orElse(null);
-
-    freshOrders.remove(orderId);
-    sortedOrders.remove(orderToRemove);
-  }
-
-
-  private void sendEvictionNotification(long orderId) {
-    // TODO bruh
-  }
-
-
-  private static ExpirationPolicy<Long, Order> newExpirationPolicy(
-      Clock clock, double decayRateMultiplier) {
-
-    // Return must be in the future. PassiveExpiringMap uses system time, an thus so must we here...
+  private static ExpirationPolicy<Long, Order> newExpirationPolicy() {
     return (ExpirationPolicy<Long, Order>) (id, order) -> {
-      val shelfLife = DecayUtil.getRemainingShelfLife(clock, order, decayRateMultiplier);
-      val shelfLifeMillis = shelfLife * 1000; // Convert to millis
+      val shelfLifeMillis = order.calculateRemainingShelfLife() * 1000; // Convert to millis
+
+      // PassiveExpiringMap uses system time, an thus so must we here...
       return System.currentTimeMillis() + shelfLifeMillis;
     };
   }

@@ -1,72 +1,28 @@
 package wtf.benedict.kitchen.api;
 
-import static com.google.gson.stream.JsonToken.NULL;
-
-import java.io.IOException;
-import java.time.Clock;
 import java.util.Arrays;
 import java.util.Iterator;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
-import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.Order;
-import wtf.benedict.kitchen.biz.Order.Temperature;
-import wtf.benedict.kitchen.biz.OrderIdGenerator;
+import wtf.benedict.kitchen.biz.OrderMessage;
 
-@AllArgsConstructor
 class OrderLoader {
-  private static final Gson gson = new GsonBuilder()
-      .registerTypeAdapter(Temperature.class, new TemperatureAdapter())
-      .create();
+  private static final Gson GSON = new Gson();
 
-  private final Iterator<Order> orders = loadOrders();
-
-  private final Clock clock;
-  private final OrderIdGenerator orderIdGenerator;
+  private final Iterator<OrderMessage> orders = loadOrders();
 
 
-  Order next() {
-    val order = orders.next();
-    order.setId(orderIdGenerator.next());
-    order.setReceived(clock.instant());
-    return order;
+  OrderMessage next() {
+    return orders.next();
   }
 
 
-  private Iterator<Order> loadOrders() {
-    val orders = gson.fromJson(ORDERS, Order[].class);
+  private Iterator<OrderMessage> loadOrders() {
+    val orders = GSON.fromJson(ORDERS, OrderMessage[].class);
     return Arrays.asList(orders).iterator();
   }
-
-
-  // Java makes it hard to use enum values for serialization, and easy to use the fragile enum
-  // names, so we jump a hoop:
-  //
-  // https://stackoverflow.com/questions/8863429/how-to-handle-a-numberformatexception-with-gson-in-deserialization-a-json-respon
-  private static class TemperatureAdapter extends TypeAdapter<Temperature> {
-    @Override
-    public Temperature read(JsonReader reader) throws IOException {
-      if (reader.peek() == NULL) {
-        reader.nextNull();
-        return null;
-      }
-
-      return Temperature.fromValue(reader.nextString());
-    }
-
-    // We don't ever write.
-    @Override
-    public void write(JsonWriter writer, Temperature value) {
-      System.out.println();
-    }
-  }
-
 
 
   // Ignore me doing this...
