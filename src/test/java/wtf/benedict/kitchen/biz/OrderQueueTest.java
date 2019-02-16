@@ -20,7 +20,7 @@ public class OrderQueueTest {
 
 
   @Test(expected = OverflowException.class)
-  public void pull() throws Exception {
+  public void pullStalest() throws Exception {
     val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
 
     val freshOrder = Order.builder()
@@ -41,9 +41,41 @@ public class OrderQueueTest {
     underTest.put(freshOrder, 1);
     underTest.put(staleOrder, 1);
 
-    assertEquals("stale", underTest.pull().getName());
-    assertEquals("fresh", underTest.pull().getName());
-    assertNull(underTest.pull());
+    assertEquals("stale", underTest.pullStalest().getName());
+    assertEquals("fresh", underTest.pullStalest().getName());
+    assertNull(underTest.pullStalest());
+  }
+
+
+  @Test(expected = OverflowException.class)
+  public void pull_byId() throws Exception {
+    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
+
+    val freshOrder = Order.builder()
+        .id(10)
+        .name("fresh")
+        .decayRate(1)
+        .shelfLife(2)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    val staleOrder = Order.builder()
+        .id(11)
+        .name("stale")
+        .decayRate(1)
+        .shelfLife(1)
+        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
+        .build();
+
+    val underTest = new OrderQueue(clock, 1, 1);
+    underTest.put(staleOrder, 1);
+    underTest.put(freshOrder, 1);
+
+    assertNull(underTest.pull(1337)); // Never existed...
+    assertEquals("fresh", underTest.pull(10).getName());
+    assertNull(underTest.pull(10));
+    assertEquals("stale", underTest.pull(11).getName());
+    assertNull(underTest.pull(11));
   }
 
 
@@ -69,9 +101,9 @@ public class OrderQueueTest {
     underTest.put(staleOrder, 1);
     underTest.put(freshOrder, 1);
 
-    assertEquals("stale", underTest.peek().getName());
-    assertEquals("stale", underTest.pull().getName());
-    assertEquals("fresh", underTest.pull().getName());
+    assertEquals("stale", underTest.peekStalest().getName());
+    assertEquals("stale", underTest.pullStalest().getName());
+    assertEquals("fresh", underTest.pullStalest().getName());
   }
 
 
@@ -117,10 +149,10 @@ public class OrderQueueTest {
     underTest.put(staleOrder, 1);
     underTest.put(multiplierOrder, 1.5);
 
-    assertEquals("stale", underTest.pull().getName());
-    assertEquals("slowDecay", underTest.pull().getName());
-    assertEquals("multiplier", underTest.pull().getName());
-    assertEquals("fresh", underTest.pull().getName());
+    assertEquals("stale", underTest.pullStalest().getName());
+    assertEquals("slowDecay", underTest.pullStalest().getName());
+    assertEquals("multiplier", underTest.pullStalest().getName());
+    assertEquals("fresh", underTest.pullStalest().getName());
   }
 
 
@@ -148,11 +180,11 @@ public class OrderQueueTest {
     underTest.put(stale, 1);
     underTest.put(fresh, 1);
 
-    assertEquals("oldNbusted", underTest.peek().getName());
+    assertEquals("oldNbusted", underTest.peekStalest().getName());
     Thread.sleep(1000);
-    assertEquals("fresh2deth", underTest.peek().getName());
+    assertEquals("fresh2deth", underTest.peekStalest().getName());
     Thread.sleep(1000);
-    assertNull(underTest.peek());
+    assertNull(underTest.peekStalest());
   }
 
 
