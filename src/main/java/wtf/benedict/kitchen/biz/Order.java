@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.val;
 
-// Shelf life calculations are not accurate to the milli.
-// TODO Test.
-public class Order {
+class Order {
   private final List<RateChange> rateChanges = new ArrayList<>();
 
   private final long id;
@@ -22,7 +20,7 @@ public class Order {
   private final double baseDecayRate;
 
 
-  public Order(
+  Order(
       long id,
       Clock clock,
       String name,
@@ -38,15 +36,21 @@ public class Order {
   }
 
 
-  public void changeDecayRate(double rate) {
+  void changeDecayRate(double rate) {
     rateChanges.add(new RateChange(clock.instant(), rate));
   }
 
 
-  public long calculateRemainingShelfLife() {
+  long calculateRemainingShelfLife() {
+    // In order to calculate decay over each segment that occurred at a particular rate, we need to
+    // used the previous segment's start time as the next segment's end time. By iterating through
+    // this list backwards, we don't have to keep track of end time explicitly.
     double decay = 0;
-    for (RateChange change : rateChanges) {
-      decay += calculateDecaySince(change);
+    Instant end = clock.instant();
+    for (int i=rateChanges.size()-1; i>=0; i--) {
+      val change = rateChanges.get(i);
+      decay += calculateDecaySince(change, end);
+      end = change.start;
     }
 
     val remainingShelfLife = initialShelfLife - decay;
@@ -54,22 +58,22 @@ public class Order {
   }
 
 
-  public long getId() {
+  long getId() {
     return id;
   }
 
-  public String getName() {
+  String getName() {
     return name;
   }
 
-  public Temperature getTemp() {
+  Temperature getTemp() {
     return temp;
   }
 
   // Decay in seconds since this change was made
-  private double calculateDecaySince(RateChange change) {
+  private double calculateDecaySince(RateChange change, Instant end) {
     val decayRate = baseDecayRate * change.decayRate;
-    val decayDuration = Duration.between(change.start, clock.instant());
+    val decayDuration = Duration.between(change.start, end);
     double decay = decayDuration.getSeconds() * decayRate;
 
     if (decay < 0) {
@@ -80,7 +84,7 @@ public class Order {
   }
 
 
-  public static class Builder {
+  static class Builder {
     private long id;
     private Clock clock;
     private String name;
@@ -88,37 +92,37 @@ public class Order {
     private int initialShelfLife;
     private double baseDecayRate;
 
-    public Builder id(long id) {
+    Builder id(long id) {
       this.id = id;
       return this;
     }
 
-    public Builder clock(Clock clock) {
+    Builder clock(Clock clock) {
       this.clock = clock;
       return this;
     }
 
-    public Builder name(String name) {
+    Builder name(String name) {
       this.name = name;
       return this;
     }
 
-    public Builder temp(Temperature temp) {
+    Builder temp(Temperature temp) {
       this.temp = temp;
       return this;
     }
 
-    public Builder initialShelfLife(int initialShelfLife) {
+    Builder initialShelfLife(int initialShelfLife) {
       this.initialShelfLife = initialShelfLife;
       return this;
     }
 
-    public Builder baseDecayRate(double baseDecayRate) {
+    Builder baseDecayRate(double baseDecayRate) {
       this.baseDecayRate = baseDecayRate;
       return this;
     }
 
-    public Order build() {
+    Order build() {
       if (id == 0 // Zero could be valid, but historically entity IDs are positive.
           || clock == null
           || name == null
