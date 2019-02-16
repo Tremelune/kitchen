@@ -7,7 +7,6 @@ import wtf.benedict.kitchen.api.KitchenFactory;
 import wtf.benedict.kitchen.api.KitchenResource;
 import wtf.benedict.kitchen.api.OrderGenerator;
 import wtf.benedict.kitchen.api.OrderLoader;
-import wtf.benedict.kitchen.biz.CustomerServiceClient;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.Storage;
 
@@ -25,6 +24,6 @@ class DependencyManager {
 
 
   private static KitchenFactory newKitchenFactory() {
-    return () -> new Kitchen(new CustomerServiceClient(), new Storage());
+    return () -> new Kitchen(new Storage());
   }
 }

@@ -15,7 +15,6 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 // TODO Enterprisize. Event sourcing...caching...message bus...CQRS...nine microservices...
 @AllArgsConstructor
 public class Kitchen {
-  private final CustomerServiceClient customerServiceClient;
   private final Storage storage;
 
   private final Random random = new Random();
@@ -25,7 +24,8 @@ public class Kitchen {
     try {
       storage.put(order);
     } catch (StaleOrderException e) {
-      customerServiceClient.refund(order);
+      val message = String.format("Refund customer! Order is too stale: %s", order);
+      throw new UnsupportedOperationException(message);
     }
 
     dispatchDriver(order.getId());
