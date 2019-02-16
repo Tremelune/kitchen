@@ -108,7 +108,8 @@ class OverflowShelf {
 
 
   static class StaleOrderException extends Exception {
-    private StaleOrderException(Order order) {
+    // Visible for testing.
+    StaleOrderException(Order order) {
       super("Order is stalest on the shelf: " + order);
     }
   }

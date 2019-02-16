@@ -11,8 +11,8 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 @AllArgsConstructor
 class Kitchen {
   private final CustomerServiceClient customerServiceClient;
-
-  private final Storage storage = new Storage();
+  private final DeliveryDepot deliveryDepot;
+  private final Storage storage;
 
 
   void receiveOrder(Order order) {
@@ -22,7 +22,7 @@ class Kitchen {
       customerServiceClient.refund(order);
     }
 
-    // TODO Dispatch driver.
+    deliveryDepot.dispatchDriver(order.getId());
   }
 
 
