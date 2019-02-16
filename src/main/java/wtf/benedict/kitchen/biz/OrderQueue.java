@@ -47,13 +47,14 @@ class OrderQueue {
     return get(true, true);
   }
 
-  Order pullFreshest() {
-    return get(true, false);
-  }
-
   // Gets stalest order without removing it.
   Order peekStalest() {
     return get(false, true);
+  }
+
+  // Gets freshest order without removing it.
+  Order peekFreshest() {
+    return get(false, false);
   }
 
 

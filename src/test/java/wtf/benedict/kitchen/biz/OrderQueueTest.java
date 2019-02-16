@@ -48,34 +48,6 @@ public class OrderQueueTest {
 
 
   @Test(expected = OverflowException.class)
-  public void pullFreshest() throws Exception {
-    val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
-
-    val freshOrder = Order.builder()
-        .name("fresh")
-        .decayRate(1)
-        .shelfLife(2)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
-
-    val staleOrder = Order.builder()
-        .name("stale")
-        .decayRate(1)
-        .shelfLife(1)
-        .received(TestUtil.instant(2019, 1, 1, 0, 0, 0))
-        .build();
-
-    val underTest = new OrderQueue(clock, 1, 1);
-    underTest.put(freshOrder, 1);
-    underTest.put(staleOrder, 1);
-
-    assertEquals("fresh", underTest.pullFreshest().getName());
-    assertEquals("stale", underTest.pullFreshest().getName());
-    assertNull(underTest.pullFreshest());
-  }
-
-
-  @Test(expected = OverflowException.class)
   public void pull_byId() throws Exception {
     val clock = TestUtil.clock(2019, 1, 1, 0, 0, 0);
 
