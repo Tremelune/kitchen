@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import lombok.AllArgsConstructor;
 import lombok.val;
 
@@ -81,6 +83,12 @@ class Order {
     }
 
     return decay;
+  }
+
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
   }
 
 
