@@ -17,8 +17,8 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class OrderQueueTest {
   @Test(expected = OverflowException.class)
   public void add_capacityCheck() throws Exception {
-    val a = newOrder(10, "fresh", 200);
-    val b = newOrder(11, "stale", 100);
+    val a = newOrder(10, 200);
+    val b = newOrder(11, 100);
 
     val underTest = new OrderQueue(1, 1);
 
@@ -29,55 +29,55 @@ public class OrderQueueTest {
 
   @Test(expected = OverflowException.class)
   public void pullStalest() throws Exception {
-    val fresh = newOrder(10, "fresh", 200);
-    val stale = newOrder(11, "stale", 100);
+    val fresh = newOrder(10, 200);
+    val stale = newOrder(11, 100);
 
     val underTest = new OrderQueue(1, 1);
     underTest.put(fresh);
     underTest.put(stale);
 
-    assertEquals("stale", underTest.pullStalest().getName());
-    assertEquals("fresh", underTest.pullStalest().getName());
+    assertEquals(stale, underTest.pullStalest());
+    assertEquals(fresh, underTest.pullStalest());
     assertNull(underTest.pullStalest());
   }
 
 
   @Test(expected = OverflowException.class)
   public void pull_byId() throws Exception {
-    val fresh = newOrder(10, "fresh", 200);
-    val stale = newOrder(11, "stale", 100);
+    val fresh = newOrder(10, 200);
+    val stale = newOrder(11, 100);
 
     val underTest = new OrderQueue(1, 1);
     underTest.put(stale);
     underTest.put(fresh);
 
     assertNull(underTest.pull(1337)); // Never existed...
-    assertEquals("fresh", underTest.pull(10).getName());
+    assertEquals(fresh, underTest.pull(10));
     assertNull(underTest.pull(10));
-    assertEquals("stale", underTest.pull(11).getName());
+    assertEquals(stale, underTest.pull(11));
     assertNull(underTest.pull(11));
   }
 
 
   @Test(expected = OverflowException.class)
   public void peek() throws Exception {
-    val fresh = newOrder(10, "fresh", 200);
-    val stale = newOrder(12, "stale", 100);
+    val fresh = newOrder(10, 200);
+    val stale = newOrder(12, 100);
 
     val underTest = new OrderQueue(1, 1);
     underTest.put(stale);
     underTest.put(fresh);
 
-    assertEquals("stale", underTest.peekStalest().getName());
-    assertEquals("stale", underTest.pullStalest().getName());
-    assertEquals("fresh", underTest.pullStalest().getName());
+    assertEquals(stale, underTest.peekStalest());
+    assertEquals(stale, underTest.pullStalest());
+    assertEquals(fresh, underTest.pullStalest());
   }
 
 
 //  @Test // TODO I think TreeSort won't do it, 'cause the sort value changes over time. Gotta sort then pull.
   public void ordering() throws Exception {
-    val fresh = newOrder(10, "fresh", 300);
-    val stale = newOrder(11, "stale", 100);
+    val fresh = newOrder(10, 300);
+    val stale = newOrder(11, 100);
 
     val fastDecay = new Order.Builder()
         .clock(clock())
@@ -93,34 +93,35 @@ public class OrderQueueTest {
     underTest.put(fastDecay);
     underTest.put(fresh);
 
-    assertEquals("fastDecay", underTest.pullStalest().getName());
-    assertEquals("stale", underTest.pullStalest().getName());
-    assertEquals("fresh", underTest.pullStalest().getName());
+    assertEquals(fastDecay, underTest.pullStalest());
+    assertEquals(stale, underTest.pullStalest());
+    assertEquals(fresh, underTest.pullStalest());
   }
 
 
   @Test
   public void expiration() throws Exception {
-    val fresh = newOrder(10, "fresh", 2);
-    val stale = newOrder(11, "stale", 1);
+    val fresh = newOrder(10, 2);
+    val stale = newOrder(11, 1);
 
     val underTest = new OrderQueue(2, 1);
     underTest.put(stale);
     underTest.put(fresh);
 
-    assertEquals("stale", underTest.peekStalest().getName());
+    // PassiveExpiringMap uses the system time, so we gotta wait in real life.
+    assertEquals(stale, underTest.peekStalest());
     Thread.sleep(1000);
-    assertEquals("fresh", underTest.peekStalest().getName());
+    assertEquals(fresh, underTest.peekStalest());
     Thread.sleep(1000);
     assertNull(underTest.peekStalest());
   }
 
 
-  private static Order newOrder(long id, String name, int initialShelfLife) {
+  private static Order newOrder(long id, int initialShelfLife) {
     return new Order.Builder()
         .clock(clock())
         .id(id)
-        .name(name)
+        .name("name")
         .temp(HOT)
         .baseDecayRate(1)
         .initialShelfLife(initialShelfLife)
