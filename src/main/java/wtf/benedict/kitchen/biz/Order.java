@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import lombok.AllArgsConstructor;
 import lombok.val;
 
-class Order {
+public class Order {
   private final List<RateChange> rateChanges = new ArrayList<>();
 
   private final long id;
@@ -22,7 +22,7 @@ class Order {
   private final double baseDecayRate;
 
 
-  Order(
+  private Order(
       long id,
       Clock clock,
       String name,
@@ -92,7 +92,7 @@ class Order {
   }
 
 
-  static class Builder {
+  public static class Builder {
     private long id;
     private Clock clock;
     private String name;
@@ -100,37 +100,37 @@ class Order {
     private int initialShelfLife;
     private double baseDecayRate;
 
-    Builder id(long id) {
+    public Builder id(long id) {
       this.id = id;
       return this;
     }
 
-    Builder clock(Clock clock) {
+    public Builder clock(Clock clock) {
       this.clock = clock;
       return this;
     }
 
-    Builder name(String name) {
+    public Builder name(String name) {
       this.name = name;
       return this;
     }
 
-    Builder temp(Temperature temp) {
+    public Builder temp(Temperature temp) {
       this.temp = temp;
       return this;
     }
 
-    Builder initialShelfLife(int initialShelfLife) {
+    public Builder initialShelfLife(int initialShelfLife) {
       this.initialShelfLife = initialShelfLife;
       return this;
     }
 
-    Builder baseDecayRate(double baseDecayRate) {
+    public Builder baseDecayRate(double baseDecayRate) {
       this.baseDecayRate = baseDecayRate;
       return this;
     }
 
-    Order build() {
+    public Order build() {
       if (id == 0 // Zero could be valid, but historically entity IDs are positive.
           || clock == null
           || name == null

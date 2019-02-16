@@ -42,7 +42,7 @@ public class KitchenApp extends Application<KitchenConfig> {
     env.healthChecks().register("kitchenHealthCheck", new KitchenHealthCheck());
 
     val jersey = env.jersey();
-    jersey.register(dependencyManager.shelfResource);
+    jersey.register(dependencyManager.kitchenResource);
 
     log.warn("Deployment complete!");
   }

@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
-class Storage {
+public class Storage {
   private static final int TEMPERATURE_SHELF_CAPACITY = 15;
   private static final int OVERFLOW_CAPACITY = 20;
 

@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OrderMessage;
 
-class OrderLoader {
+public class OrderLoader {
   private static final Gson GSON = new Gson();
 
   private final Iterator<OrderMessage> orders = loadOrders();

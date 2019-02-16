@@ -2,6 +2,7 @@ package wtf.benedict.kitchen.biz;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,14 +26,14 @@ public class KitchenTest {
   @Mock
   private CustomerServiceClient customerServiceClient;
   @Mock
-  private DeliveryDepot deliveryDepot;
-  @Mock
   private Storage storage;
 
 
   @Test
   public void orderShouldBeFoundById() {
-    val underTest = new Kitchen(customerServiceClient, deliveryDepot, new Storage());
+    Storage storage = new Storage();
+    val underTest = new Kitchen(customerServiceClient, storage);
+
     assertNull(underTest.pickupOrder(1337));
 
     val order = new Order.Builder()
@@ -46,16 +47,13 @@ public class KitchenTest {
 
     underTest.receiveOrder(order);
     assertEquals(order, underTest.pickupOrder(10));
-
-    val orderId = ArgumentCaptor.forClass(Long.class);
-    verify(deliveryDepot, times(1)).dispatchDriver(orderId.capture());
-    assertEquals(10, (long) orderId.getValue());
+    assertNull(storage.pull(10));
   }
 
 
   @Test
   public void rejectedOrderShouldGetRefund() throws Exception {
-    val underTest = new Kitchen(customerServiceClient, deliveryDepot, storage);
+    val underTest = new Kitchen(customerServiceClient, storage);
     doThrow(new StaleOrderException(null)).when(storage).put(any());
 
     val order = mock(Order.class);
@@ -67,5 +65,18 @@ public class KitchenTest {
     verify(customerServiceClient, times(1)).refund(orderCaptor.capture());
 
     assertEquals(10, orderCaptor.getValue().getId());
+  }
+
+
+  @Test
+  public void randomShouldAlwaysBeWithinRange() {
+    val underTest = new Kitchen(customerServiceClient, storage);
+
+    // Just try it a bunch and see if it's ever out of range.
+    for (int i = 0; i < 1000; i++) {
+      int delay = underTest.getPickupDelay();
+      assertTrue(delay >= 2000);
+      assertTrue(delay <= 10000);
+    }
   }
 }
