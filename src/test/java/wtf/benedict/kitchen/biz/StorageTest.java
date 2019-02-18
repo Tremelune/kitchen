@@ -14,7 +14,7 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class StorageTest {
   @Test
   public void orderShouldBeFoundById() throws Exception {
-    val underTest = new Storage();
+    val underTest = new Storage((id, order) -> {});
 
     val hot = newOrder(10, HOT);
     val cold = newOrder(11, COLD);
@@ -24,7 +24,7 @@ public class StorageTest {
     underTest.put(cold);
     underTest.put(frozen);
 
-    assertNull(underTest.pull(13));
+    assertNull(underTest.pull(1337));
     assertEquals(hot, underTest.pull(10));
     assertEquals(cold, underTest.pull(11));
     assertEquals(frozen, underTest.pull(12));

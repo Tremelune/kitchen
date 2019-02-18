@@ -18,7 +18,7 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class OverflowShelfTest {
   @Test
   public void pull_byOrderId() throws Exception {
-    val underTest = new OverflowShelf(2);
+    val underTest = new OverflowShelf(2, (id, order) -> {});
 
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);
@@ -31,7 +31,7 @@ public class OverflowShelfTest {
 
   @Test
   public void pushAndPullShouldTrackSize() throws Exception {
-    val underTest = new OverflowShelf(1);
+    val underTest = new OverflowShelf(1, (id, order) -> {});
 
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);
@@ -51,7 +51,7 @@ public class OverflowShelfTest {
 
   @Test(expected = StaleOrderException.class)
   public void overflowShouldRejectNewOrderIfItsStalest() throws Exception {
-    val underTest = new OverflowShelf(1);
+    val underTest = new OverflowShelf(1, (id, order) -> {});
 
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);
@@ -63,7 +63,7 @@ public class OverflowShelfTest {
 
   @Test
   public void overflowShouldDiscardStalest() throws Exception {
-    val underTest = new OverflowShelf(1);
+    val underTest = new OverflowShelf(1, (id, order) -> {});
 
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);

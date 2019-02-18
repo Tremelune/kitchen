@@ -24,8 +24,8 @@ public class KitchenTest {
 
   @Test
   public void orderShouldBeFoundById() {
-    Storage storage = new Storage();
-    val underTest = new Kitchen(storage);
+    Storage storage = new Storage((id, order) -> {});
+    val underTest = new Kitchen(expirationListener -> storage);
 
     assertNull(underTest.pickupOrder(1337));
 
@@ -46,7 +46,7 @@ public class KitchenTest {
 
   @Test(expected = UnsupportedOperationException.class)
   public void rejectedOrderShouldGetRefund() throws Exception {
-    val underTest = new Kitchen(storage);
+    val underTest = new Kitchen(expirationListener -> storage);
     doThrow(new StaleOrderException(null)).when(storage).put(any());
 
     underTest.receiveOrder(null);
@@ -55,7 +55,7 @@ public class KitchenTest {
 
   @Test
   public void randomShouldAlwaysBeWithinRange() {
-    val underTest = new Kitchen(storage);
+    val underTest = new Kitchen(expirationListener -> storage);
 
     // Just try it a bunch and see if it's ever out of range.
     for (int i = 0; i < 1000; i++) {

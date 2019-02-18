@@ -14,12 +14,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
+import wtf.benedict.kitchen.biz.Kitchen;
 
 public class KitchenResourceTest {
-  private final KitchenFactory kitchenFactory = mock(KitchenFactory.class);
+  private final Kitchen kitchen = mock(Kitchen.class);
   private final OrderGenerator orderGenerator = mock(OrderGenerator.class);
 
-  private final KitchenResource underTest = new KitchenResource(kitchenFactory, orderGenerator);
+  private final KitchenResource underTest = new KitchenResource(kitchen, orderGenerator);
 
 
   @Rule

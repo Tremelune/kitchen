@@ -6,6 +6,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.util.ArrayList;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpiringMap;
 
 // TODO Notification of eviction.
@@ -17,14 +18,17 @@ class OrderQueue {
   private final double decayRateMultiplier;
 
 
-  OrderQueue(int capacity, double decayRateMultiplier) {
+  OrderQueue(int capacity, double decayRateMultiplier, ExpirationListener<Long, Order> expirationListener) {
     if (capacity < 1) {
       throw new IllegalArgumentException("Capacity must be positive!");
     }
 
     this.capacity = capacity;
     this.decayRateMultiplier = decayRateMultiplier;
-    freshOrders = ExpiringMap.builder().variableExpiration().build();
+    freshOrders = ExpiringMap.builder()
+        .variableExpiration()
+        .expirationListener(expirationListener)
+        .build();
   }
 
 

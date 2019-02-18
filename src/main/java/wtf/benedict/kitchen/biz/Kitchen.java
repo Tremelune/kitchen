@@ -4,8 +4,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import lombok.AllArgsConstructor;
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
 // TODO Cancel drivers.
@@ -13,11 +13,18 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 // TODO Per-order decay strategy.
 // TODO Display.
 // TODO Enterprisize. Event sourcing...caching...message bus...CQRS...nine microservices...
-@AllArgsConstructor
 public class Kitchen {
-  private final Storage storage;
+  private final StorageFactory storageFactory;
 
   private final Random random = new Random();
+
+  private Storage storage;
+
+
+  public Kitchen(StorageFactory storageFactory) {
+    this.storageFactory = storageFactory;
+    reset();
+  }
 
 
   public void receiveOrder(Order order) {
@@ -29,6 +36,11 @@ public class Kitchen {
     }
 
     dispatchDriver(order.getId());
+  }
+
+
+  public void reset() {
+    storage = storageFactory.newStorage(newExpirationListener());
   }
 
 
@@ -57,5 +69,12 @@ public class Kitchen {
   int getPickupDelay() {
     int secs = random.nextInt(8) + 2;
     return secs * 1000;
+  }
+
+
+  private ExpirationListener<Long, Order> newExpirationListener() {
+    return (id, order) -> {
+      // TODO
+    };
   }
 }
