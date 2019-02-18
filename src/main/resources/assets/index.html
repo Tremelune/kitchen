@@ -1,1 +1,35 @@
-WHATTUP WORL
+<!DOCTYPE html>
+<html>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+    document.write('wtf');
+</script>
+
+<script>
+    // Start the order generation.
+    $(document).ready(function() {
+        $.ajax({
+            url: "/api/kitchens/starts",
+            type: "POST",
+            success: function(result) {
+                console.log(result)
+            }
+        })
+    });
+
+    $(document).ready(function() {
+        $.ajax({
+            url: "/api/kitchens",
+            type: "GET",
+            success: function(result) {
+                console.log(result)
+            }
+        })
+    });
+
+</script>
+
+</body>
+</html>
