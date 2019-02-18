@@ -9,19 +9,30 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
 public class Storage {
   private static final int TEMPERATURE_SHELF_CAPACITY = 15;
   private static final int OVERFLOW_CAPACITY = 20;
 
-  private final OverflowShelf overflowShelf = new OverflowShelf(OVERFLOW_CAPACITY);
+  private final ExpirationListener<Long, Order> expirationListener;
+  private final OverflowShelf overflowShelf;
+  private final Map<Temperature, TemperatureShelf> tempToShelf;
 
-  private final Map<Temperature, TemperatureShelf> tempToShelf = ImmutableMap.of(
-      HOT, new TemperatureShelf(TEMPERATURE_SHELF_CAPACITY, overflowShelf, HOT),
-      COLD, new TemperatureShelf(TEMPERATURE_SHELF_CAPACITY, overflowShelf, COLD),
-      FROZEN, new TemperatureShelf(TEMPERATURE_SHELF_CAPACITY, overflowShelf, FROZEN)
-  );
+
+  public Storage(ExpirationListener<Long, Order> expirationListener) {
+    this.expirationListener = expirationListener;
+
+    overflowShelf = new OverflowShelf(OVERFLOW_CAPACITY, expirationListener);
+
+    // This must happen after expirationListener and overflowSHelf are initialized.
+    tempToShelf = ImmutableMap.of(
+        HOT, newShelf(HOT),
+        COLD, newShelf(COLD),
+        FROZEN, newShelf(FROZEN)
+    );
+  }
 
 
   void put(Order order) throws StaleOrderException {
@@ -41,5 +52,11 @@ public class Storage {
     }
 
     return null;
+  }
+
+
+  private TemperatureShelf newShelf(Temperature temp) {
+    return new TemperatureShelf(
+        TEMPERATURE_SHELF_CAPACITY, overflowShelf, temp, expirationListener);
   }
 }

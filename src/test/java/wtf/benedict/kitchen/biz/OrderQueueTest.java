@@ -20,7 +20,7 @@ public class OrderQueueTest {
     val a = newOrder(10, 200);
     val b = newOrder(11, 100);
 
-    val underTest = new OrderQueue(1, 1);
+    val underTest = new OrderQueue(1, 1, (id, order) -> {});
 
     underTest.put(a);
     underTest.put(b);
@@ -33,7 +33,7 @@ public class OrderQueueTest {
     val staler = newOrder(11, 200);
     val stalest = newOrder(12, 100);
 
-    val underTest = new OrderQueue(3, 1);
+    val underTest = new OrderQueue(3, 1, (id, order) -> {});
     underTest.put(staler);
     underTest.put(stalest);
     underTest.put(stale);
@@ -50,7 +50,7 @@ public class OrderQueueTest {
     val fresh = newOrder(10, 200);
     val stale = newOrder(11, 100);
 
-    val underTest = new OrderQueue(2, 1);
+    val underTest = new OrderQueue(2, 1, (id, order) -> {});
     underTest.put(stale);
     underTest.put(fresh);
 
@@ -67,7 +67,7 @@ public class OrderQueueTest {
     val fresh = newOrder(10, 200);
     val stale = newOrder(12, 100);
 
-    val underTest = new OrderQueue(2, 1);
+    val underTest = new OrderQueue(2, 1, (id, order) -> {});
     underTest.put(stale);
     underTest.put(fresh);
 
@@ -82,7 +82,7 @@ public class OrderQueueTest {
     val fresh = newOrder(10, 2);
     val stale = newOrder(11, 1);
 
-    val underTest = new OrderQueue(2, 1);
+    val underTest = new OrderQueue(2, 1, (id, order) -> {});
     underTest.put(stale);
     underTest.put(fresh);
 
@@ -97,7 +97,7 @@ public class OrderQueueTest {
 
   private static Order newOrder(long id, int initialShelfLife) {
     return new Order.Builder()
-        .clock(clock())
+        .clock(newClock())
         .id(id)
         .name("name")
         .temp(HOT)
@@ -107,7 +107,7 @@ public class OrderQueueTest {
   }
 
 
-  private static Clock clock() {
+  private static Clock newClock() {
     val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
     val two = TestUtil.instant(2019, 1, 1, 0, 0, 1);
 

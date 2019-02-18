@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 
 class OverflowShelf {
@@ -25,12 +26,12 @@ class OverflowShelf {
   private int size;
 
 
-  OverflowShelf(int capacity) {
+  OverflowShelf(int capacity, ExpirationListener<Long, Order> expirationListener) {
     this.capacity = capacity;
 
-    queues.put(HOT, new OrderQueue(capacity, DECAY_RATE));
-    queues.put(COLD, new OrderQueue(capacity, DECAY_RATE));
-    queues.put(FROZEN, new OrderQueue(capacity, DECAY_RATE));
+    queues.put(HOT, new OrderQueue(capacity, DECAY_RATE, expirationListener));
+    queues.put(COLD, new OrderQueue(capacity, DECAY_RATE, expirationListener));
+    queues.put(FROZEN, new OrderQueue(capacity, DECAY_RATE, expirationListener));
   }
 
 

@@ -85,6 +85,13 @@
       <version>1.3.5</version>
     </dependency>
 
+    <!--Expiring map -->
+    <dependency>
+      <groupId>net.jodah</groupId>
+      <artifactId>expiringmap</artifactId>
+      <version>0.5.8</version>
+    </dependency>
+
     <!-- Database connections. -->
     <!--<dependency>-->
       <!--<groupId>mysql</groupId>-->

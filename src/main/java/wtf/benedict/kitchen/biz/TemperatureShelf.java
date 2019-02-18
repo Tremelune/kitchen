@@ -1,6 +1,7 @@
 package wtf.benedict.kitchen.biz;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
@@ -12,8 +13,8 @@ class TemperatureShelf {
   private final Temperature temp;
 
 
-  TemperatureShelf(int capacity, OverflowShelf overflowShelf, Temperature temp) {
-    this.queue = new OrderQueue(capacity, DECAY_RATE);
+  TemperatureShelf(int capacity, OverflowShelf overflowShelf, Temperature temp, ExpirationListener<Long, Order> expirationListener) {
+    this.queue = new OrderQueue(capacity, DECAY_RATE, expirationListener);
     this.overflowShelf = overflowShelf;
     this.temp = temp;
   }

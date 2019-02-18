@@ -1,31 +1,34 @@
 package wtf.benedict.kitchen.biz;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 
-import org.apache.commons.collections4.map.PassiveExpiringMap;
-import org.apache.commons.collections4.map.PassiveExpiringMap.ExpirationPolicy;
-
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
+import net.jodah.expiringmap.ExpiringMap;
 
 // TODO Notification of eviction.
 // TODO Calculate shelf life with proposed rate change in mind.
 class OrderQueue {
-  private final PassiveExpiringMap<Long, Order> freshOrders;
+  private final ExpiringMap<Long, Order> freshOrders;
 
   private final int capacity;
   private final double decayRateMultiplier;
 
 
-  OrderQueue(int capacity, double decayRateMultiplier) {
+  OrderQueue(int capacity, double decayRateMultiplier, ExpirationListener<Long, Order> expirationListener) {
     if (capacity < 1) {
       throw new IllegalArgumentException("Capacity must be positive!");
     }
 
     this.capacity = capacity;
     this.decayRateMultiplier = decayRateMultiplier;
-    freshOrders = new PassiveExpiringMap<>(newExpirationPolicy());
+    freshOrders = ExpiringMap.builder()
+        .variableExpiration()
+        .expirationListener(expirationListener)
+        .build();
   }
 
 
@@ -34,7 +37,7 @@ class OrderQueue {
       throw new OverflowException(capacity);
     }
 
-    freshOrders.put(order.getId(), order);
+    freshOrders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
     order.changeDecayRate(decayRateMultiplier);
   }
 
@@ -85,16 +88,6 @@ class OrderQueue {
     orders.sort(comparator);
 
     return orders.iterator().next();
-  }
-
-
-  private static ExpirationPolicy<Long, Order> newExpirationPolicy() {
-    return (ExpirationPolicy<Long, Order>) (id, order) -> {
-      val shelfLifeMillis = order.calculateRemainingShelfLife() * 1000; // Convert to millis
-
-      // PassiveExpiringMap uses system time, an thus so must we here...
-      return System.currentTimeMillis() + shelfLifeMillis;
-    };
   }
 
 

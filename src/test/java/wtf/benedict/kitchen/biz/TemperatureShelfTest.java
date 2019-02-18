@@ -16,8 +16,8 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class TemperatureShelfTest {
   @Test
   public void put() throws Exception {
-    val overflowShelf = new OverflowShelf(10); // Capacity is arbitrary
-    val underTest = new TemperatureShelf(1, overflowShelf, HOT);
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
 
     val order = newOrder(10, 100);
 
@@ -29,8 +29,8 @@ public class TemperatureShelfTest {
 
   @Test
   public void put_shouldOverflowFreshestOntoOverflowShelf() throws Exception {
-    val overflowShelf = new OverflowShelf(10); // Capacity is arbitrary
-    val underTest = new TemperatureShelf(1, overflowShelf, HOT);
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
 
     val fresh = newOrder(10, 1000);
     val stale = newOrder(11, 100);
@@ -47,8 +47,8 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull() throws Exception {
-    val overflowShelf = new OverflowShelf(10); // Capacity is arbitrary
-    val underTest = new TemperatureShelf(1, overflowShelf, HOT);
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
 
     val order = newOrder(10, 100);
 
@@ -61,8 +61,8 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull_pullsFromOverflow() throws Exception {
-    val overflowShelf = new OverflowShelf(10); // Capacity is arbitrary
-    val underTest = new TemperatureShelf(1, overflowShelf, HOT);
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
 
     val order = newOrder(10, 1000);
 
@@ -74,8 +74,8 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull_pullsFromOverflowWhenSpaceBecomesAvailable() throws Exception {
-    val overflowShelf = new OverflowShelf(10); // Capacity is arbitrary
-    val underTest = new TemperatureShelf(1, overflowShelf, HOT);
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
 
     val order = newOrder(10, 1000);
     val overflow = newOrder(11, 1000);
@@ -91,7 +91,7 @@ public class TemperatureShelfTest {
 
   private static Order newOrder(long id, int initialShelfLife) {
     return new Order.Builder()
-        .clock(clock())
+        .clock(newClock())
         .id(id)
         .name("name")
         .temp(HOT)
@@ -101,12 +101,22 @@ public class TemperatureShelfTest {
   }
 
 
-  private static Clock clock() {
+  private static Clock newClock() {
     val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
     val two = TestUtil.instant(2019, 1, 1, 0, 0, 1);
 
     val clock = mock(Clock.class);
     when(clock.instant()).thenReturn(one, two);
     return clock;
+  }
+
+
+  private static OverflowShelf newOverflowShelf() {
+    // Capacity is arbitrary, but enough for tests
+    return new OverflowShelf(10, (id, order) -> {});
+  }
+
+  private static TemperatureShelf newTemperatureShelf(OverflowShelf overflowShelf) {
+    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {});
   }
 }
