@@ -1,7 +1,7 @@
 package wtf.benedict.kitchen.app;
 
 import java.util.TimeZone;
-
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.Application;
 import io.dropwizard.bundles.webjars.WebJarBundle;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
@@ -31,6 +31,7 @@ public class KitchenApp extends Application<KitchenConfig> {
     val sourceProvider = new ResourceConfigurationSourceProvider();
     bootstrap.setConfigurationSourceProvider(sourceProvider);
     bootstrap.addBundle(new WebJarBundle());
+    bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
   }
 
 
