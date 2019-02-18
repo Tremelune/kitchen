@@ -16,9 +16,9 @@ public class Storage {
   private static final int TEMPERATURE_SHELF_CAPACITY = 15;
   private static final int OVERFLOW_CAPACITY = 20;
 
+  final OverflowShelf overflowShelf;
+  final Map<Temperature, TemperatureShelf> tempToShelf;
   private final ExpirationListener<Long, Order> expirationListener;
-  private final OverflowShelf overflowShelf;
-  private final Map<Temperature, TemperatureShelf> tempToShelf;
 
 
   public Storage(ExpirationListener<Long, Order> expirationListener) {

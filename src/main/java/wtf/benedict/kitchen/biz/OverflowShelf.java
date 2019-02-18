@@ -16,7 +16,7 @@ import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 class OverflowShelf {
   private static final int DECAY_RATE = 2;
 
-  private final Map<Temperature, OrderQueue> queues = new HashMap<>();
+  final Map<Temperature, OrderQueue> queues = new HashMap<>();
 
   private final int capacity;
 

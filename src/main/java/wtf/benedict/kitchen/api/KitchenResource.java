@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import lombok.AllArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 import wtf.benedict.kitchen.biz.Kitchen;
+import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 @Path("/kitchens")
 @Consumes(APPLICATION_JSON)
@@ -23,10 +24,9 @@ public class KitchenResource {
   private final OrderGenerator orderGenerator;
 
 
-  // TODO Return full state of the system.
   @GET
-  public Response getShelves() {
-    return Response.status(200).entity("HELLO WORLD").build();
+  public StorageState getShelves() {
+    return kitchen.getState();
   }
 
 
