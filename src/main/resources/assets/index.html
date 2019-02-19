@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="1" />
 </head>
 
 <body>
@@ -14,8 +13,29 @@
         })
     }
 
+
+    function writeShelfHeader(table) {
+        var html =
+            "<td><strong>Temp</strong></td>" +
+            "<td><strong>Name</strong></td>" +
+            "<td><strong>Shelf Life (s)</strong></td>";
+
+        var row = document.createElement("tr");
+        row.innerHTML = html;
+
+        table.appendChild(row);
+    }
+
+
     function writeShelf(tableId, entries) {
         var table = document.getElementById(tableId);
+
+        // Clear out old list
+        while (table.firstChild) {
+            table.removeChild(table.firstChild);
+        }
+
+        writeShelfHeader(table);
 
         $.each(entries, function(i, entry) {
             var html =
@@ -33,10 +53,25 @@
     function writeDeliveries(orderIdToDelivery) {
         var table = document.getElementById("drivers");
 
+        // Clear out old list
+        while (table.firstChild) {
+            table.removeChild(table.firstChild);
+        }
+
+        // Add header
+        var headerHtml =
+            "<td><strong>Order ID</strong></td>" +
+            "<td><strong>Order Name</strong></td>" +
+            "<td><strong>Time Until Picku (s)</strong></td>";
+
+        var headerRow = document.createElement("tr");
+        headerRow.innerHTML = headerHtml;
+
+        table.appendChild(headerRow);
+
+        // Add data
         for (var orderId in orderIdToDelivery) {
-            console.log(orderId);
             var delivery = orderIdToDelivery[orderId];
-            console.log(delivery);
 
             var html =
                 "<td>" + orderId + "</td>" +
@@ -62,11 +97,13 @@
     function updateState() {
         $.getJSON("/api/kitchens", function (result) {
             writeState(result)
-        })
+        });
+
+        setTimeout(updateState, 1000)
     }
 
     $(document).ready(function() {
-        window.setInterval(updateState(), 1000);
+        updateState();
     });
 </script>
 
