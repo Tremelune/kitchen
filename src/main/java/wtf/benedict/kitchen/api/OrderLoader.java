@@ -14,6 +14,10 @@ public class OrderLoader {
   private final Iterator<OrderMessage> orders = loadOrders();
 
 
+  boolean hasNext() {
+    return orders.hasNext();
+  }
+
   OrderMessage next() {
     return orders.next();
   }

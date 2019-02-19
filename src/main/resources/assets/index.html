@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta http-equiv="refresh" content="1" />
+</head>
+
 <body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
@@ -9,27 +13,23 @@
 
 <script>
     // Start the order generation.
-    $(document).ready(function() {
-        $.ajax({
-            url: "/api/kitchens/starts",
-            type: "POST",
-            success: function(result) {
-                console.log(result)
-            }
+    function start() {
+        $.post("/api/kitchens/starts", function(data, status) {
+            console.log(data)
         })
-    });
+    }
 
     $(document).ready(function() {
-        $.ajax({
-            url: "/api/kitchens",
-            type: "GET",
-            success: function(result) {
-                console.log(result)
-            }
+        $.getJSON("/api/kitchens", function(result) {
+            console.log(result)
         })
     });
 
 </script>
+
+KITCHEN
+
+<button onclick="start()">Click me</button>
 
 </body>
 </html>
