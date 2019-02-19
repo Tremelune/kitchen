@@ -91,12 +91,12 @@ public class TemperatureShelfTest {
 
   private static Order newOrder(long id, int initialShelfLife) {
     return new Order.Builder()
-        .clock(newClock())
         .id(id)
         .name("name")
         .temp(HOT)
         .baseDecayRate(1)
         .initialShelfLife(initialShelfLife)
+        .decayStrategy(new CumulativeDecayStrategy(newClock()))
         .build();
   }
 

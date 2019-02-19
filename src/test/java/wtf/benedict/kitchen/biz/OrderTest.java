@@ -33,12 +33,12 @@ public class OrderTest {
 
   private static Order newOrder(Clock clock, double baseDecayRate, int initialShelfLife) {
     return new Order.Builder()
-        .clock(clock)
         .id(10)
         .name("name")
         .temp(HOT)
         .baseDecayRate(baseDecayRate)
         .initialShelfLife(initialShelfLife)
+        .decayStrategy(new CumulativeDecayStrategy(clock))
         .build();
   }
 }

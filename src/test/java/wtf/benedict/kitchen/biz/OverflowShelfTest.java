@@ -78,17 +78,17 @@ public class OverflowShelfTest {
 
   private static Order newOrder(long id, Temperature temp, int initialShelfLife) {
     return new Order.Builder()
-        .clock(clock())
         .id(id)
         .name("name")
         .temp(temp)
         .baseDecayRate(1)
         .initialShelfLife(initialShelfLife)
+        .decayStrategy(new CumulativeDecayStrategy(newClock()))
         .build();
   }
 
 
-  private static Clock clock() {
+  private static Clock newClock() {
     val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
     val two = TestUtil.instant(2019, 1, 1, 0, 0, 1);
 

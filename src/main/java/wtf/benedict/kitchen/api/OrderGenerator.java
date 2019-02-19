@@ -11,6 +11,7 @@ import lombok.val;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.Order;
 import wtf.benedict.kitchen.biz.OrderMessage;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
 import wtf.benedict.kitchen.biz.Temperature;
 
 @AllArgsConstructor
@@ -57,13 +58,15 @@ public class OrderGenerator {
 
 
   private Order asOrder(OrderMessage message) {
+    val decayStrategy = new CumulativeDecayStrategy(clock);
+
     return new Order.Builder()
-        .clock(clock)
         .id(nextOrderId())
         .name(message.getName())
         .temp(Temperature.fromValue(message.getTemp()))
         .baseDecayRate(message.getDecayRate())
         .initialShelfLife(message.getShelfLife())
+        .decayStrategy(decayStrategy)
         .build();
   }
 

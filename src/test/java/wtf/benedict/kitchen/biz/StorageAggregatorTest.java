@@ -99,12 +99,12 @@ public class StorageAggregatorTest {
 
   private static Order newOrder(long id, String name, Temperature temp, int initialShelfLife) {
     return new Order.Builder()
-        .clock(TestUtil.clock(2019, 1, 1, 0, 0, 0))
         .id(id)
         .name(name)
         .temp(temp)
         .baseDecayRate(1)
         .initialShelfLife(initialShelfLife)
+        .decayStrategy(new CumulativeDecayStrategy(TestUtil.clock(2019, 1, 1, 0, 0, 0)))
         .build();
   }
 }

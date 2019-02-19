@@ -33,12 +33,12 @@ public class StorageTest {
 
   private static Order newOrder(long id, Temperature temp) {
     return new Order.Builder()
-        .clock(TestUtil.clock(2019, 1, 1, 0, 0, 0))
         .id(id)
         .name("name")
         .temp(temp)
         .baseDecayRate(1)
         .initialShelfLife(100)
+        .decayStrategy(new CumulativeDecayStrategy(TestUtil.clock(2019, 1, 1, 0, 0, 0)))
         .build();
   }
 }
