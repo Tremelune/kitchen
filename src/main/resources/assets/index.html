@@ -22,11 +22,10 @@
         shelves.appendChild(header);
 
         $.each(entries, function(i, entry) {
-            var json = JSON.stringify(entry);
-            console.log("### " + json);
+            var html = "<p>" + entry.temp + " <strong>" + entry.name + "</strong> " + entry.remainingShelfLife + "</p>";
 
             var row = document.createElement("div");
-            row.innerHTML = json;
+            row.innerHTML = html;
 
             shelves.appendChild(row);
         });
