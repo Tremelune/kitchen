@@ -8,13 +8,15 @@ import static wtf.benedict.kitchen.biz.Temperature.HOT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.val;
+import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 
 public class StorageAggregator {
-  StorageState getState(Storage storage) {
+  StorageState getState(Storage storage, Map<Long, Delivery> orderIdToDelivery) {
     val hotEntries = toEntries(storage, HOT);
     val coldEntries = toEntries(storage, COLD);
     val frozenEntries = toEntries(storage, FROZEN);
@@ -30,6 +32,7 @@ public class StorageAggregator {
         .coldEntries(coldEntries)
         .frozenEntries(frozenEntries)
         .overflowEntries(overflowEntries)
+        .orderIdToDelivery(orderIdToDelivery)
         .build();
   }
 
@@ -56,6 +59,7 @@ public class StorageAggregator {
 
 
 
+  /** This is part of the public API. Changes here might break it! */
   @Builder
   @Getter
   public static class StorageState {
@@ -63,6 +67,7 @@ public class StorageAggregator {
     private List<Entry> coldEntries;
     private List<Entry> frozenEntries;
     private List<Entry> overflowEntries;
+    private Map<Long, Delivery> orderIdToDelivery;
   }
 
 

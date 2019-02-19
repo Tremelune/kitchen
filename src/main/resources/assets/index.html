@@ -30,13 +30,33 @@
         });
     }
 
-    function writeState(state) {
-        console.log(state);
+    function writeDeliveries(orderIdToDelivery) {
+        var table = document.getElementById("drivers");
 
+        for (var orderId in orderIdToDelivery) {
+            console.log(orderId);
+            var delivery = orderIdToDelivery[orderId];
+            console.log(delivery);
+
+            var html =
+                "<td>" + orderId + "</td>" +
+                "<td><strong>" + delivery.name + "</strong></td>" +
+                "<td>" + delivery.secondsUntilPickup + "</td>";
+
+            var row = document.createElement("tr");
+            row.innerHTML = html;
+
+            table.appendChild(row);
+        }
+    }
+
+    function writeState(state) {
         writeShelf("overflow", state.overflowEntries);
         writeShelf("hot", state.hotEntries);
         writeShelf("cold", state.coldEntries);
         writeShelf("frozen", state.frozenEntries);
+
+        writeDeliveries(state.orderIdToDelivery)
     }
 
     function updateState() {
@@ -54,7 +74,19 @@
 
 <button onclick="start()">Generate orders</button>
 
-<div id="shelves">
+<div>
+    <div style="float:right">
+        <h3>DRIVERS</h3>
+
+        <table id="drivers">
+            <tr>
+                <td><strong>Order ID</strong></td>
+                <td><strong>Order Name</strong></td>
+                <td><strong>Time Until Pickup (s)</strong></td>
+            </tr>
+        </table>
+    </div>
+
     <div>
         <h3>OVERFLOW SHELF</h3>
 

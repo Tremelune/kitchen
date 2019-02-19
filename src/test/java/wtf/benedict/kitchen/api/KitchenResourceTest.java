@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
+import java.util.HashMap;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +21,7 @@ import com.google.gson.Gson;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import lombok.val;
+import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
@@ -43,15 +46,20 @@ public class KitchenResourceTest {
 
 
   @Test
-  public void getShelves() {
+  public void getState() {
     val entry = StorageAggregator.Entry.builder()
         .name("chicken")
         .temp(HOT)
         .remainingShelfLife(100)
         .build();
 
+    val orderIdToDelivery = new HashMap<Long, Delivery>() {{
+      put(10L, new Delivery("meatball", 150));
+    }};
+
     val state = StorageState.builder()
         .hotEntries(TestUtil.asList(entry))
+        .orderIdToDelivery(orderIdToDelivery)
         .build();
 
     when(kitchen.getState()).thenReturn(state);
@@ -67,6 +75,9 @@ public class KitchenResourceTest {
     assertEquals("chicken", responseState.getHotEntries().get(0).getName());
     assertEquals(HOT, responseState.getHotEntries().get(0).getTemp());
     assertEquals(100, responseState.getHotEntries().get(0).getRemainingShelfLife());
+    assertEquals(1, responseState.getOrderIdToDelivery().keySet().size());
+    assertEquals("meatball", responseState.getOrderIdToDelivery().get(10L).getName());
+    assertEquals(150, responseState.getOrderIdToDelivery().get(10L).getSecondsUntilPickup());
   }
 
 

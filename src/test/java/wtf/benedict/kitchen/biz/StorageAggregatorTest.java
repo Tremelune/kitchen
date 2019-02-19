@@ -35,7 +35,7 @@ public class StorageAggregatorTest {
     storage.put(b);
     storage.put(c);
 
-    val state = storageAggregator.getState(storage);
+    val state = storageAggregator.getState(storage, null);
 
     assertEquals(1, state.getHotEntries().size());
     assertEquals("a", state.getHotEntries().get(0).getName());
@@ -62,7 +62,7 @@ public class StorageAggregatorTest {
     overFlowOrders(storage, 20, COLD);
     overFlowOrders(storage, 30, FROZEN);
 
-    val state = storageAggregator.getState(storage);
+    val state = storageAggregator.getState(storage, null);
 
     // Order isn't guaranteed, so just see if they're there...
     assertEquals(3, state.getOverflowEntries().size());

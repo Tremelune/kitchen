@@ -1,7 +1,5 @@
 package wtf.benedict.kitchen.biz;
 
-import java.util.Random;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import lombok.val;
@@ -10,19 +8,18 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 // TODO Cancel drivers.
-// TODO Include drivers in state.
 // TODO Per-order decay strategy.
 // TODO There's a concurrency error somewhere.
 public class Kitchen {
+  private final DriverDepot driverDepot;
   private final StorageAggregator storageAggregator;
   private final StorageFactory storageFactory;
-
-  private final Random random = new Random();
 
   private Storage storage;
 
 
-  public Kitchen(StorageAggregator storageAggregator, StorageFactory storageFactory) {
+  public Kitchen(DriverDepot driverDepot, StorageAggregator storageAggregator, StorageFactory storageFactory) {
+    this.driverDepot = driverDepot;
     this.storageAggregator = storageAggregator;
     this.storageFactory = storageFactory;
     reset();
@@ -30,7 +27,8 @@ public class Kitchen {
 
 
   public StorageState getState() {
-    return storageAggregator.getState(storage);
+    val pickups = driverDepot.getState();
+    return storageAggregator.getState(storage, pickups);
   }
 
 
@@ -39,14 +37,16 @@ public class Kitchen {
       storage.put(order);
     } catch (StaleOrderException e) {
       val message = String.format("Refund customer! Order is too stale: %s", order);
-      throw new UnsupportedOperationException(message);
+      throw new IllegalArgumentException(message);
     }
 
-    dispatchDriver(order.getId());
+    val pickupTask = newPickupTask(this, order.getId());
+    driverDepot.schedulePickup(pickupTask, order);
   }
 
 
   public void reset() {
+    driverDepot.reset();
     storage = storageFactory.newStorage(newExpirationListener());
   }
 
@@ -56,26 +56,12 @@ public class Kitchen {
   }
 
 
-  void dispatchDriver(long orderId) {
-    val task = newTask(this, orderId);
-    val timer = new Timer("Pickup Timer - " + orderId);
-    timer.schedule(task, getPickupDelay());
-  }
-
-
-  private TimerTask newTask(Kitchen kitchen, long orderId) {
+  private TimerTask newPickupTask(Kitchen kitchen, long orderId) {
     return new TimerTask() {
       public void run() {
         kitchen.pickupOrder(orderId);
       }
     };
-  }
-
-
-  // Returns a delay in millis, between 3-10s. Visible for testing.
-  int getPickupDelay() {
-    int secs = random.nextInt(8) + 2;
-    return secs * 1000;
   }
 
 

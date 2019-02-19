@@ -2,7 +2,6 @@ package wtf.benedict.kitchen.biz;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
@@ -19,13 +18,15 @@ import wtf.benedict.kitchen.test.TestUtil;
 @RunWith(MockitoJUnitRunner.class)
 public class KitchenTest {
   @Mock
+  private DriverDepot driverDepot;
+  @Mock
   private Storage storage;
 
 
   @Test
   public void orderShouldBeFoundById() {
     Storage storage = new Storage((id, order) -> {});
-    val underTest = new Kitchen(null, (expirationListener) -> storage);
+    val underTest = new Kitchen(driverDepot, null, (expirationListener) -> storage);
 
     assertNull(underTest.pickupOrder(1337));
 
@@ -44,24 +45,11 @@ public class KitchenTest {
   }
 
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void rejectedOrderShouldGetRefund() throws Exception {
-    val underTest = new Kitchen(null, (expirationListener) -> storage);
+    val underTest = new Kitchen(driverDepot, null, (expirationListener) -> storage);
     doThrow(new StaleOrderException(null)).when(storage).put(any());
 
     underTest.receiveOrder(null);
-  }
-
-
-  @Test
-  public void randomShouldAlwaysBeWithinRange() {
-    val underTest = new Kitchen(null, (expirationListener) -> storage);
-
-    // Just try it a bunch and see if it's ever out of range.
-    for (int i = 0; i < 1000; i++) {
-      int delay = underTest.getPickupDelay();
-      assertTrue(delay >= 2000);
-      assertTrue(delay <= 10000);
-    }
   }
 }
