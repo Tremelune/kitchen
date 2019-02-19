@@ -8,22 +8,58 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-    document.write('wtf');
-</script>
-
-<script>
     // Start the order generation.
     function start() {
         $.post("/api/kitchens/starts", function(data, status) {
-            console.log(data)
         })
     }
 
     function writeState(state) {
-        var json = JSON.stringify(state);
-        console.log(json);
-        var node = document.getElementById('shelves');
-        node.innerHTML = "<code>" + json + "</code>";
+        console.log(state);
+
+        $.each(state.hotEntries, function(i, entry) {
+            var json = JSON.stringify(entry);
+            console.log("### " + json);
+
+            var row = document.createElement("div");
+            row.innerHTML = json;
+
+            var shelves = document.getElementById("shelves");
+            shelves.appendChild(row);
+        });
+
+        $.each(state.coldEntries, function(i, entry) {
+            var json = JSON.stringify(entry);
+            console.log("### " + json);
+
+            var row = document.createElement("div");
+            row.innerHTML = json;
+
+            var shelves = document.getElementById("shelves");
+            shelves.appendChild(row);
+        });
+
+        $.each(state.frozenEntries, function(i, entry) {
+            var json = JSON.stringify(entry);
+            console.log("### " + json);
+
+            var row = document.createElement("div");
+            row.innerHTML = json;
+
+            var shelves = document.getElementById("shelves");
+            shelves.appendChild(row);
+        });
+
+        $.each(state.overflowEntries, function(i, entry) {
+            var json = JSON.stringify(entry);
+            console.log("### " + json);
+
+            var row = document.createElement("div");
+            row.innerHTML = json;
+
+            var shelves = document.getElementById("shelves");
+            shelves.appendChild(row);
+        });
     }
 
     $(document).ready(function() {
