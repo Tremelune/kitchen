@@ -14,52 +14,31 @@
         })
     }
 
+    function writeShelf(name, entries) {
+        var header = document.createElement("h3");
+        header.innerHTML = name + " shelf";
+
+        var shelves = document.getElementById("shelves");
+        shelves.appendChild(header);
+
+        $.each(entries, function(i, entry) {
+            var json = JSON.stringify(entry);
+            console.log("### " + json);
+
+            var row = document.createElement("div");
+            row.innerHTML = json;
+
+            shelves.appendChild(row);
+        });
+    }
+
     function writeState(state) {
         console.log(state);
 
-        $.each(state.hotEntries, function(i, entry) {
-            var json = JSON.stringify(entry);
-            console.log("### " + json);
-
-            var row = document.createElement("div");
-            row.innerHTML = json;
-
-            var shelves = document.getElementById("shelves");
-            shelves.appendChild(row);
-        });
-
-        $.each(state.coldEntries, function(i, entry) {
-            var json = JSON.stringify(entry);
-            console.log("### " + json);
-
-            var row = document.createElement("div");
-            row.innerHTML = json;
-
-            var shelves = document.getElementById("shelves");
-            shelves.appendChild(row);
-        });
-
-        $.each(state.frozenEntries, function(i, entry) {
-            var json = JSON.stringify(entry);
-            console.log("### " + json);
-
-            var row = document.createElement("div");
-            row.innerHTML = json;
-
-            var shelves = document.getElementById("shelves");
-            shelves.appendChild(row);
-        });
-
-        $.each(state.overflowEntries, function(i, entry) {
-            var json = JSON.stringify(entry);
-            console.log("### " + json);
-
-            var row = document.createElement("div");
-            row.innerHTML = json;
-
-            var shelves = document.getElementById("shelves");
-            shelves.appendChild(row);
-        });
+        writeShelf("hot", state.hotEntries);
+        writeShelf("cold", state.coldEntries);
+        writeShelf("frozen", state.frozenEntries);
+        writeShelf("overflow", state.overflowEntries);
     }
 
     $(document).ready(function() {
