@@ -11,7 +11,7 @@ import wtf.benedict.kitchen.biz.OrderMessage;
 public class OrderLoader {
   private static final Gson GSON = new Gson();
 
-  private final Iterator<OrderMessage> orders = loadOrders();
+  private Iterator<OrderMessage> orders = loadOrders();
 
 
   boolean hasNext() {
@@ -20,6 +20,10 @@ public class OrderLoader {
 
   OrderMessage next() {
     return orders.next();
+  }
+
+  void reset() {
+    orders = loadOrders();
   }
 
 

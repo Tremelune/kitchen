@@ -34,6 +34,7 @@ public class KitchenResource {
   @Path("/starts")
   public Response start() {
     kitchen.reset();
+    orderGenerator.reset();
     orderGenerator.generateOrders(kitchen);
     return Response.status(200).build();
   }

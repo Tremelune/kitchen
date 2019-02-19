@@ -19,17 +19,24 @@
         })
     }
 
+    function writeState(state) {
+        var json = JSON.stringify(state);
+        console.log(json);
+        var node = document.getElementById('shelves');
+        node.innerHTML = "<code>" + json + "</code>";
+    }
+
     $(document).ready(function() {
         $.getJSON("/api/kitchens", function(result) {
-            console.log(result)
+            writeState(result)
         })
     });
-
 </script>
 
-KITCHEN
+<h1>KITCHEN</h1>
 
-<button onclick="start()">Click me</button>
+<button onclick="start()">Generate orders</button>
 
+<div id="shelves"></div>
 </body>
 </html>
