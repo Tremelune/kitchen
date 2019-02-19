@@ -12,7 +12,7 @@ import net.jodah.expiringmap.ExpiringMap;
 // TODO Notification of eviction.
 // TODO Calculate shelf life with proposed rate change in mind.
 class OrderQueue {
-  private final ExpiringMap<Long, Order> freshOrders;
+  final ExpiringMap<Long, Order> freshOrders;
 
   private final int capacity;
   private final double decayRateMultiplier;

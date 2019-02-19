@@ -7,13 +7,14 @@ import java.util.TimerTask;
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 // TODO Cancel drivers.
-// TODO Move overflow stuff when stuff is evicted from temp shelves.
+// TODO Include drivers in state.
 // TODO Per-order decay strategy.
-// TODO Display.
-// TODO Enterprisize. Event sourcing...caching...message bus...CQRS...nine microservices...
+// TODO There's a concurrency error somewhere.
 public class Kitchen {
+  private final StorageAggregator storageAggregator;
   private final StorageFactory storageFactory;
 
   private final Random random = new Random();
@@ -21,9 +22,15 @@ public class Kitchen {
   private Storage storage;
 
 
-  public Kitchen(StorageFactory storageFactory) {
+  public Kitchen(StorageAggregator storageAggregator, StorageFactory storageFactory) {
+    this.storageAggregator = storageAggregator;
     this.storageFactory = storageFactory;
     reset();
+  }
+
+
+  public StorageState getState() {
+    return storageAggregator.getState(storage);
   }
 
 

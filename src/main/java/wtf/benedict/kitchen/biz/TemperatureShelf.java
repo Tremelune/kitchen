@@ -8,7 +8,7 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 class TemperatureShelf {
   private static final int DECAY_RATE = 1;
 
-  private final OrderQueue queue;
+  final OrderQueue queue;
   private final OverflowShelf overflowShelf;
   private final Temperature temp;
 

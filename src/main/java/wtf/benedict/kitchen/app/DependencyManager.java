@@ -8,6 +8,7 @@ import wtf.benedict.kitchen.api.OrderGenerator;
 import wtf.benedict.kitchen.api.OrderLoader;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.Storage;
+import wtf.benedict.kitchen.biz.StorageAggregator;
 
 /** Guice with no Guice. */
 class DependencyManager {
@@ -18,7 +19,8 @@ class DependencyManager {
     val clock = Clock.systemUTC();
     val orderLoader = new OrderLoader();
     val orderGenerator = new OrderGenerator(clock, orderLoader);
-    val kitchen = new Kitchen(Storage::new);
+    val storageAggregator = new StorageAggregator();
+    val kitchen = new Kitchen(storageAggregator, Storage::new);
     kitchenResource = new KitchenResource(kitchen, orderGenerator);
   }
 }

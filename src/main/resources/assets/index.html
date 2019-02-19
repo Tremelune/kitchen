@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="1" />
+</head>
+
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+    // Start the order generation.
+    function start() {
+        $.post("/api/kitchens/starts", function(data, status) {
+        })
+    }
+
+    function writeShelf(tableId, entries) {
+        var table = document.getElementById(tableId);
+
+        $.each(entries, function(i, entry) {
+            var html =
+                "<td>" + entry.temp + "</td>" +
+                "<td><strong>" + entry.name + "</strong></td>" +
+                "<td>" + entry.remainingShelfLife + "</td>";
+
+            var row = document.createElement("tr");
+            row.innerHTML = html;
+
+            table.appendChild(row);
+        });
+    }
+
+    function writeState(state) {
+        console.log(state);
+
+        writeShelf("overflow", state.overflowEntries);
+        writeShelf("hot", state.hotEntries);
+        writeShelf("cold", state.coldEntries);
+        writeShelf("frozen", state.frozenEntries);
+    }
+
+    function updateState() {
+        $.getJSON("/api/kitchens", function (result) {
+            writeState(result)
+        })
+    }
+
+    $(document).ready(function() {
+        window.setInterval(updateState(), 1000);
+    });
+</script>
+
+<h1>KITCHEN</h1>
+
+<button onclick="start()">Generate orders</button>
+
+<div id="shelves">
+    <div>
+        <h3>OVERFLOW SHELF</h3>
+
+        <table id="overflow">
+            <tr>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>HOT SHELF</h3>
+
+        <table id="hot">
+            <tr>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>COLD SHELF</h3>
+
+        <table id="cold">
+            <tr>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>FROZEN SHELF</h3>
+
+        <table id="frozen">
+            <tr>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
