@@ -5,19 +5,22 @@ import static wtf.benedict.kitchen.biz.Temperature.COLD;
 import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.val;
+import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
 
-// TODO We need the calculated time to pickup, not the initial.
 public class StorageAggregator {
-  StorageState getState(Storage storage, Map<Long, DriverDepot.Delivery> orderIdToDelivery) {
+  StorageState getState(Storage storage, Map<Long, Pickup> orderIdToDelivery) {
     val hotEntries = toEntries(storage, HOT);
     val coldEntries = toEntries(storage, COLD);
     val frozenEntries = toEntries(storage, FROZEN);
@@ -28,8 +31,8 @@ public class StorageAggregator {
       overflowEntries.addAll(entries);
     }
 
-    val deliveries = orderIdToDelivery.values().stream()
-//        .map(StorageAggregator::toDelivery)
+    val pickups = orderIdToDelivery.values().stream()
+        .map(StorageAggregator::toScheduledPickup)
         .sorted(newPickupComparator())
         .collect(toList());
 
@@ -38,7 +41,7 @@ public class StorageAggregator {
         .coldEntries(coldEntries)
         .frozenEntries(frozenEntries)
         .overflowEntries(overflowEntries)
-        .deliveries(deliveries)
+        .pickups(pickups)
         .build();
   }
 
@@ -64,34 +67,44 @@ public class StorageAggregator {
   }
 
 
-//  private static Delivery toDelivery(Pickup pickup) {
-//    val duration = Duration.between(Instant.now(), pickup.getTime());
-//    return new Delivery(pickup.getOrder().getName(), duration.getSeconds());
-//  }
+  private static ScheduledPickup toScheduledPickup(Pickup pickup) {
+    val duration = Duration.between(Instant.now(), pickup.getTime());
+    val seconds = Math.max(0, duration.getSeconds());
+    return new ScheduledPickup(pickup.getOrder().getName(), seconds);
+  }
 
 
-  private static Comparator<DriverDepot.Delivery> newPickupComparator() {
-    return Comparator.comparingLong(DriverDepot.Delivery::getSecondsUntilPickup);
+  // In order of pickup time, soonest first.
+  private static Comparator<ScheduledPickup> newPickupComparator() {
+    return Comparator.comparingLong(ScheduledPickup::getSecondsUntilPickup);
   }
 
 
   /** These are part of the public API. Changes here might break it! */
   @Builder
-  @Getter
+  @Data
   public static class StorageState {
     private List<Entry> hotEntries;
     private List<Entry> coldEntries;
     private List<Entry> frozenEntries;
     private List<Entry> overflowEntries;
-    private List<DriverDepot.Delivery> deliveries;
+    private List<ScheduledPickup> pickups;
   }
 
 
   @Builder
-  @Getter
+  @Data
   public static class Entry {
     private String name;
     private Temperature temp;
     private long remainingShelfLife;
+  }
+
+
+  @AllArgsConstructor
+  @Data
+  public static class ScheduledPickup {
+    private String orderName;
+    private long secondsUntilPickup;
   }
 }

@@ -1,5 +1,9 @@
 package wtf.benedict.kitchen.biz;
 
+import static java.time.temporal.ChronoUnit.MILLIS;
+
+import java.time.Clock;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -11,11 +15,14 @@ import lombok.Getter;
 import lombok.val;
 
 public class DriverDepot {
-  private final Map<Long, Delivery> orderIdToDelivery = new HashMap<>();
+  private final Map<Long, Pickup> orderIdToPickup = new HashMap<>();
   private final Random random = new Random();
 
+  private final Clock clock;
 
-  public DriverDepot() {
+
+  public DriverDepot(Clock clock) {
+    this.clock = clock;
     reset();
   }
 
@@ -25,15 +32,14 @@ public class DriverDepot {
   }
 
 
-  Map<Long, Delivery> getState() {
-    return new HashMap<>(orderIdToDelivery); // Hide the internal state from callers.
+  Map<Long, Pickup> getState() {
+    return new HashMap<>(orderIdToPickup); // Hide the internal state from callers.
   }
 
 
   void reset() {
-    orderIdToDelivery.clear();
+    orderIdToPickup.clear();
   }
-
 
   private void dispatchDriver(TimerTask pickupTask, Order order) {
     // This ensures orders are removed from the map when picked up.
@@ -41,30 +47,32 @@ public class DriverDepot {
       @Override
       public void run() {
         pickupTask.run();
-        orderIdToDelivery.remove(order.getId());
+        orderIdToPickup.remove(order.getId());
       }
     };
 
     int pickupDelay = getPickupDelay();
     val timer = new Timer("Pickup Timer - " + order.getId());
     timer.schedule(removalTask, pickupDelay);
-    val delivery = new Delivery(order.getName(), Math.round(pickupDelay / 1000));
-    orderIdToDelivery.put(order.getId(), delivery);
+
+    val pickupTime = clock.instant().plus(pickupDelay, MILLIS);
+    val delivery = new Pickup(order, pickupTime);
+
+    orderIdToPickup.put(order.getId(), delivery);
   }
 
 
-  // Returns a delay in millis, between 2-10s. Visible for testing.
-  int getPickupDelay() {
-    int secs = random.nextInt(8) + 2;
-    return secs * 1000;
+  // Returns a delay in millis, between 2000-10000.
+  private int getPickupDelay() {
+    val delay = random.nextInt(8) + 2;
+    return delay * 1000;
   }
 
 
-  /** This is part of the public API. Changes here might break it! */
   @AllArgsConstructor
   @Getter
-  public static class Delivery {
-    private String name;
-    private long secondsUntilPickup;
+  static class Pickup {
+    private Order order;
+    private Instant time;
   }
 }

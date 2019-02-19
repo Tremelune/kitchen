@@ -50,7 +50,7 @@
         });
     }
 
-    function writeDeliveries(deliveries) {
+    function writeDeliveries(pickups) {
         var table = document.getElementById("drivers");
 
         // Clear out old list
@@ -69,11 +69,11 @@
         table.appendChild(headerRow);
 
         // Add data
-        $.each(deliveries, function(i, delivery) {
+        $.each(pickups, function(i, pickup) {
 
             var html =
-                "<td><strong>" + delivery.name + "</strong></td>" +
-                "<td>" + delivery.secondsUntilPickup + "</td>";
+                "<td><strong>" + pickup.orderName + "</strong></td>" +
+                "<td>" + pickup.secondsUntilPickup + "</td>";
 
             var row = document.createElement("tr");
             row.innerHTML = html;
@@ -88,7 +88,7 @@
         writeShelf("cold", state.coldEntries);
         writeShelf("frozen", state.frozenEntries);
 
-        writeDeliveries(state.deliveries)
+        writeDeliveries(state.pickups)
     }
 
     function updateState() {

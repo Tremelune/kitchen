@@ -18,7 +18,7 @@ class DependencyManager {
 
   DependencyManager() {
     val clock = Clock.systemUTC();
-    val driverDepot = new DriverDepot();
+    val driverDepot = new DriverDepot(clock);
     val orderLoader = new OrderLoader();
     val orderGenerator = new OrderGenerator(clock, orderLoader);
     val storageAggregator = new StorageAggregator();

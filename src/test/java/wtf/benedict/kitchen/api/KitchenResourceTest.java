@@ -20,9 +20,9 @@ import com.google.gson.Gson;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import lombok.val;
-import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
+import wtf.benedict.kitchen.biz.StorageAggregator.ScheduledPickup;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 public class KitchenResourceTest {
@@ -53,7 +53,7 @@ public class KitchenResourceTest {
 
     val state = StorageState.builder()
         .hotEntries(asList(entry))
-        .deliveries(asList(new Delivery("meatball", 150)))
+        .pickups(asList(new ScheduledPickup("meatball", 150)))
         .build();
 
     when(kitchen.getState()).thenReturn(state);
@@ -69,9 +69,9 @@ public class KitchenResourceTest {
     assertEquals("chicken", responseState.getHotEntries().get(0).getName());
     assertEquals(HOT, responseState.getHotEntries().get(0).getTemp());
     assertEquals(100, responseState.getHotEntries().get(0).getRemainingShelfLife());
-    assertEquals(1, responseState.getDeliveries().size());
-    assertEquals("meatball", responseState.getDeliveries().get(0).getName());
-    assertEquals(150, responseState.getDeliveries().get(0).getSecondsUntilPickup());
+    assertEquals(1, responseState.getPickups().size());
+    assertEquals("meatball", responseState.getPickups().get(0).getOrderName());
+    assertEquals(150, responseState.getPickups().get(0).getSecondsUntilPickup());
   }
 
 
