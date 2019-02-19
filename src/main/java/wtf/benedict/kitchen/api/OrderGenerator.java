@@ -41,7 +41,6 @@ public class OrderGenerator {
     val task = newOrderTask(kitchen, order);
     val timer = new Timer("Generate order");
     int delay = poissonDelay() * 1000; // Convert to seconds
-    System.out.println("#### DELAY " + delay);
     timer.schedule(task, delay);
   }
 
