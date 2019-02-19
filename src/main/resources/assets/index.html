@@ -14,20 +14,20 @@
         })
     }
 
-    function writeShelf(name, entries) {
-        var header = document.createElement("h3");
-        header.innerHTML = name + " shelf";
-
-        var shelves = document.getElementById("shelves");
-        shelves.appendChild(header);
+    function writeShelf(tableId, entries) {
+        var table = document.getElementById(tableId);
 
         $.each(entries, function(i, entry) {
-            var html = "<p>" + entry.temp + " <strong>" + entry.name + "</strong> " + entry.remainingShelfLife + "</p>";
+            var html =
+                "<td>" + entry.temp + "</td>" +
+                "<td><strong>" + entry.name + "</strong></td>" +
+                "<td>todo</td>" +
+                "<td>" + entry.remainingShelfLife + "</td>";
 
-            var row = document.createElement("div");
+            var row = document.createElement("tr");
             row.innerHTML = html;
 
-            shelves.appendChild(row);
+            table.appendChild(row);
         });
     }
 
@@ -51,6 +51,55 @@
 
 <button onclick="start()">Generate orders</button>
 
-<div id="shelves"></div>
+<div id="shelves">
+    <div>
+        <h3>HOT SHELF</h3>
+
+        <table id="hot">
+            <tr>
+                <td>Temp</td>
+                <td>Name</td>
+                <td>Base (Actual) Display Rate</td>
+                <td>Remaining Shelf Life</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>COLD SHELF</h3>
+
+        <table id="cold">
+            <tr>
+                <td>Temp</td>
+                <td>Name</td>
+                <td>Base (Actual) Display Rate</td>
+                <td>Remaining Shelf Life</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>FROZEN SHELF</h3>
+
+        <table id="frozen">
+            <tr>
+                <td>Temp</td>
+                <td>Name</td>
+                <td>Base (Actual) Display Rate</td>
+                <td>Remaining Shelf Life</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <h3>OVERFLOW SHELF</h3>
+
+        <table id="overflow">
+            <tr>
+                <td>Temp</td>
+                <td>Name</td>
+                <td>Base (Actual) Display Rate</td>
+                <td>Remaining Shelf Life</td>
+            </tr>
+        </table>
+    </div>
+</div>
 </body>
 </html>
