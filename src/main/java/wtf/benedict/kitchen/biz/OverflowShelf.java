@@ -14,7 +14,7 @@ import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 
 class OverflowShelf {
-  private static final int DECAY_RATE = 2;
+  static final int DECAY_RATE = 2;
 
   final Map<Temperature, OrderQueue> queues = new HashMap<>();
 

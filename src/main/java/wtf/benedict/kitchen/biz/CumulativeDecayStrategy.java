@@ -23,6 +23,17 @@ public class CumulativeDecayStrategy implements DecayStrategy {
 
 
   @Override
+  public long calculateRemainingShelfLifeAt(
+      double baseDecayRate, long initialShelfLife, double newDecayRate) {
+
+    val remainingShelfLife = calculateRemainingShelfLife(baseDecayRate, initialShelfLife);
+    val rate = newDecayRate * baseDecayRate;
+    val nextLife = remainingShelfLife / rate;
+    return Math.round(nextLife);
+  }
+
+
+  @Override
   public long calculateRemainingShelfLife(double baseDecayRate, long initialShelfLife) {
     // In order to calculate decay over each segment that occurred at a particular rate, we need to
     // used the previous segment's start time as the next segment's end time. By iterating through

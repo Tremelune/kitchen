@@ -63,7 +63,13 @@ class TemperatureShelf {
       return;
     }
 
-    if (order.calculateRemainingShelfLife() > currentFreshest.calculateRemainingShelfLife()) {
+    long currentFreshestLife =
+        currentFreshest.calculateRemainingShelfLifeAt(OverflowShelf.DECAY_RATE);
+
+    long orderLife =
+        order.calculateRemainingShelfLifeAt(OverflowShelf.DECAY_RATE);
+
+    if (orderLife > currentFreshestLife) {
       overflowShelf.put(order);
     } else {
       overflowShelf.put(currentFreshest);

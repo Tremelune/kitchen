@@ -38,6 +38,10 @@ public class Order {
     return decayStrategy.calculateRemainingShelfLife(baseDecayRate, initialShelfLife);
   }
 
+  long calculateRemainingShelfLifeAt(double decayRate) {
+    return decayStrategy.calculateRemainingShelfLifeAt(baseDecayRate, initialShelfLife, decayRate);
+  }
+
 
   long getId() {
     return id;

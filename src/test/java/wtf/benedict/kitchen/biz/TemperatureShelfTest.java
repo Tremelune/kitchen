@@ -46,6 +46,21 @@ public class TemperatureShelfTest {
 
 
   @Test
+  public void put_shouldOverflowWithLowerDecayRate() throws Exception {
+    val overflowShelf = newOverflowShelf();
+    val underTest = newTemperatureShelf(overflowShelf);
+
+    val lowDecay = newOrder(10, 1, 100); // Lasts 50s on overflow
+    val highDecay = newOrder(11, 10, 100); // Lasts 5s on overflow
+
+    underTest.put(lowDecay);
+    underTest.put(highDecay);
+
+    assertEquals(lowDecay, overflowShelf.pullStalest(HOT));
+  }
+
+
+  @Test
   public void pull() throws Exception {
     val overflowShelf = newOverflowShelf();
     val underTest = newTemperatureShelf(overflowShelf);
@@ -90,11 +105,15 @@ public class TemperatureShelfTest {
 
 
   private static Order newOrder(long id, int initialShelfLife) {
+    return newOrder(id, 1, initialShelfLife);
+  }
+
+  private static Order newOrder(long id, double baseDecayRate, int initialShelfLife) {
     return new Order.Builder()
         .id(id)
         .name("name")
         .temp(HOT)
-        .baseDecayRate(1)
+        .baseDecayRate(baseDecayRate)
         .initialShelfLife(initialShelfLife)
         .decayStrategy(new CumulativeDecayStrategy(newClock()))
         .build();
