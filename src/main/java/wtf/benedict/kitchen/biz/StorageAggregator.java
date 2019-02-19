@@ -7,16 +7,17 @@ import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.val;
-import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 
+// TODO We need the calculated time to pickup, not the initial.
 public class StorageAggregator {
-  StorageState getState(Storage storage, Map<Long, Delivery> orderIdToDelivery) {
+  StorageState getState(Storage storage, Map<Long, DriverDepot.Delivery> orderIdToDelivery) {
     val hotEntries = toEntries(storage, HOT);
     val coldEntries = toEntries(storage, COLD);
     val frozenEntries = toEntries(storage, FROZEN);
@@ -27,12 +28,17 @@ public class StorageAggregator {
       overflowEntries.addAll(entries);
     }
 
+    val deliveries = orderIdToDelivery.values().stream()
+//        .map(StorageAggregator::toDelivery)
+        .sorted(newPickupComparator())
+        .collect(toList());
+
     return StorageState.builder()
         .hotEntries(hotEntries)
         .coldEntries(coldEntries)
         .frozenEntries(frozenEntries)
         .overflowEntries(overflowEntries)
-        .orderIdToDelivery(orderIdToDelivery)
+        .deliveries(deliveries)
         .build();
   }
 
@@ -58,8 +64,18 @@ public class StorageAggregator {
   }
 
 
+//  private static Delivery toDelivery(Pickup pickup) {
+//    val duration = Duration.between(Instant.now(), pickup.getTime());
+//    return new Delivery(pickup.getOrder().getName(), duration.getSeconds());
+//  }
 
-  /** This is part of the public API. Changes here might break it! */
+
+  private static Comparator<DriverDepot.Delivery> newPickupComparator() {
+    return Comparator.comparingLong(DriverDepot.Delivery::getSecondsUntilPickup);
+  }
+
+
+  /** These are part of the public API. Changes here might break it! */
   @Builder
   @Getter
   public static class StorageState {
@@ -67,7 +83,7 @@ public class StorageAggregator {
     private List<Entry> coldEntries;
     private List<Entry> frozenEntries;
     private List<Entry> overflowEntries;
-    private Map<Long, Delivery> orderIdToDelivery;
+    private List<DriverDepot.Delivery> deliveries;
   }
 
 

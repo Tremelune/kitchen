@@ -1,15 +1,21 @@
 package wtf.benedict.kitchen.biz;
 
+import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static wtf.benedict.kitchen.biz.Temperature.COLD;
 import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.test.TestUtil.assertSize;
+
+import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import lombok.val;
+import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.test.TestUtil;
 
@@ -35,7 +41,11 @@ public class StorageAggregatorTest {
     storage.put(b);
     storage.put(c);
 
-    val state = storageAggregator.getState(storage, null);
+    val orderIdToDelivery = new HashMap<Long, Delivery>() {{
+      put(10L, new Delivery("a", 150));
+    }};
+
+    val state = storageAggregator.getState(storage, orderIdToDelivery);
 
     assertEquals(1, state.getHotEntries().size());
     assertEquals("a", state.getHotEntries().get(0).getName());
@@ -51,6 +61,10 @@ public class StorageAggregatorTest {
     assertEquals("c", state.getFrozenEntries().get(0).getName());
     assertEquals(FROZEN, state.getFrozenEntries().get(0).getTemp());
     assertEquals(200, state.getFrozenEntries().get(0).getRemainingShelfLife());
+
+    assertSize(1, state.getDeliveries());
+    assertEquals("a", state.getDeliveries().get(0).getName());
+    assertTrue(state.getDeliveries().get(0).getSecondsUntilPickup() >= 149); // Time passing slush...
   }
 
 
@@ -62,7 +76,7 @@ public class StorageAggregatorTest {
     overFlowOrders(storage, 20, COLD);
     overFlowOrders(storage, 30, FROZEN);
 
-    val state = storageAggregator.getState(storage, null);
+    val state = storageAggregator.getState(storage, emptyMap());
 
     // Order isn't guaranteed, so just see if they're there...
     assertEquals(3, state.getOverflowEntries().size());

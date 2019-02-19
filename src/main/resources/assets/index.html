@@ -50,7 +50,7 @@
         });
     }
 
-    function writeDeliveries(orderIdToDelivery) {
+    function writeDeliveries(deliveries) {
         var table = document.getElementById("drivers");
 
         // Clear out old list
@@ -60,9 +60,8 @@
 
         // Add header
         var headerHtml =
-            "<td><strong>Order ID</strong></td>" +
             "<td><strong>Order Name</strong></td>" +
-            "<td><strong>Time Until Picku (s)</strong></td>";
+            "<td><strong>Time Until Pickup (s)</strong></td>";
 
         var headerRow = document.createElement("tr");
         headerRow.innerHTML = headerHtml;
@@ -70,11 +69,9 @@
         table.appendChild(headerRow);
 
         // Add data
-        for (var orderId in orderIdToDelivery) {
-            var delivery = orderIdToDelivery[orderId];
+        $.each(deliveries, function(i, delivery) {
 
             var html =
-                "<td>" + orderId + "</td>" +
                 "<td><strong>" + delivery.name + "</strong></td>" +
                 "<td>" + delivery.secondsUntilPickup + "</td>";
 
@@ -82,7 +79,7 @@
             row.innerHTML = html;
 
             table.appendChild(row);
-        }
+        });
     }
 
     function writeState(state) {
@@ -91,7 +88,7 @@
         writeShelf("cold", state.coldEntries);
         writeShelf("frozen", state.frozenEntries);
 
-        writeDeliveries(state.orderIdToDelivery)
+        writeDeliveries(state.deliveries)
     }
 
     function updateState() {
@@ -99,7 +96,7 @@
             writeState(result)
         });
 
-        setTimeout(updateState, 1000)
+        setTimeout(updateState, 100)
     }
 
     $(document).ready(function() {
@@ -114,59 +111,24 @@
 <div>
     <div style="float:right">
         <h3>DRIVERS</h3>
-
-        <table id="drivers">
-            <tr>
-                <td><strong>Order ID</strong></td>
-                <td><strong>Order Name</strong></td>
-                <td><strong>Time Until Pickup (s)</strong></td>
-            </tr>
-        </table>
+        <table id="drivers"></table>
     </div>
 
     <div>
         <h3>OVERFLOW SHELF</h3>
-
-        <table id="overflow">
-            <tr>
-                <td><strong>Temp</strong></td>
-                <td><strong>Name</strong></td>
-                <td><strong>Shelf Life (s)</strong></td>
-            </tr>
-        </table>
+        <table id="overflow"></table>
     </div>
     <div>
         <h3>HOT SHELF</h3>
-
-        <table id="hot">
-            <tr>
-                <td><strong>Temp</strong></td>
-                <td><strong>Name</strong></td>
-                <td><strong>Shelf Life (s)</strong></td>
-            </tr>
-        </table>
+        <table id="hot"></table>
     </div>
     <div>
         <h3>COLD SHELF</h3>
-
-        <table id="cold">
-            <tr>
-                <td><strong>Temp</strong></td>
-                <td><strong>Name</strong></td>
-                <td><strong>Shelf Life (s)</strong></td>
-            </tr>
-        </table>
+        <table id="cold"></table>
     </div>
     <div>
         <h3>FROZEN SHELF</h3>
-
-        <table id="frozen">
-            <tr>
-                <td><strong>Temp</strong></td>
-                <td><strong>Name</strong></td>
-                <td><strong>Shelf Life (s)</strong></td>
-            </tr>
-        </table>
+        <table id="frozen"></table>
     </div>
 </div>
 </body>

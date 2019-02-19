@@ -7,8 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
-
-import java.util.HashMap;
+import static wtf.benedict.kitchen.test.TestUtil.asList;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
@@ -25,7 +24,6 @@ import wtf.benedict.kitchen.biz.DriverDepot.Delivery;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
-import wtf.benedict.kitchen.test.TestUtil;
 
 public class KitchenResourceTest {
   private final Kitchen kitchen = mock(Kitchen.class);
@@ -53,13 +51,9 @@ public class KitchenResourceTest {
         .remainingShelfLife(100)
         .build();
 
-    val orderIdToDelivery = new HashMap<Long, Delivery>() {{
-      put(10L, new Delivery("meatball", 150));
-    }};
-
     val state = StorageState.builder()
-        .hotEntries(TestUtil.asList(entry))
-        .orderIdToDelivery(orderIdToDelivery)
+        .hotEntries(asList(entry))
+        .deliveries(asList(new Delivery("meatball", 150)))
         .build();
 
     when(kitchen.getState()).thenReturn(state);
@@ -75,9 +69,9 @@ public class KitchenResourceTest {
     assertEquals("chicken", responseState.getHotEntries().get(0).getName());
     assertEquals(HOT, responseState.getHotEntries().get(0).getTemp());
     assertEquals(100, responseState.getHotEntries().get(0).getRemainingShelfLife());
-    assertEquals(1, responseState.getOrderIdToDelivery().keySet().size());
-    assertEquals("meatball", responseState.getOrderIdToDelivery().get(10L).getName());
-    assertEquals(150, responseState.getOrderIdToDelivery().get(10L).getSecondsUntilPickup());
+    assertEquals(1, responseState.getDeliveries().size());
+    assertEquals("meatball", responseState.getDeliveries().get(0).getName());
+    assertEquals(150, responseState.getDeliveries().get(0).getSecondsUntilPickup());
   }
 
 
