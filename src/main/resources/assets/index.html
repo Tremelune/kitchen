@@ -21,7 +21,6 @@
             var html =
                 "<td>" + entry.temp + "</td>" +
                 "<td><strong>" + entry.name + "</strong></td>" +
-                "<td>todo</td>" +
                 "<td>" + entry.remainingShelfLife + "</td>";
 
             var row = document.createElement("tr");
@@ -34,10 +33,10 @@
     function writeState(state) {
         console.log(state);
 
+        writeShelf("overflow", state.overflowEntries);
         writeShelf("hot", state.hotEntries);
         writeShelf("cold", state.coldEntries);
         writeShelf("frozen", state.frozenEntries);
-        writeShelf("overflow", state.overflowEntries);
     }
 
     $(document).ready(function() {
@@ -53,14 +52,24 @@
 
 <div id="shelves">
     <div>
+        <h3>OVERFLOW SHELF</h3>
+
+        <table id="overflow">
+            <tr>
+                <td>Temp</td>
+                <td>Name</td>
+                <td>Remaining Shelf Life</td>
+            </tr>
+        </table>
+    </div>
+    <div>
         <h3>HOT SHELF</h3>
 
         <table id="hot">
             <tr>
-                <td>Temp</td>
-                <td>Name</td>
-                <td>Base (Actual) Display Rate</td>
-                <td>Remaining Shelf Life</td>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
             </tr>
         </table>
     </div>
@@ -69,10 +78,9 @@
 
         <table id="cold">
             <tr>
-                <td>Temp</td>
-                <td>Name</td>
-                <td>Base (Actual) Display Rate</td>
-                <td>Remaining Shelf Life</td>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
             </tr>
         </table>
     </div>
@@ -81,22 +89,9 @@
 
         <table id="frozen">
             <tr>
-                <td>Temp</td>
-                <td>Name</td>
-                <td>Base (Actual) Display Rate</td>
-                <td>Remaining Shelf Life</td>
-            </tr>
-        </table>
-    </div>
-    <div>
-        <h3>OVERFLOW SHELF</h3>
-
-        <table id="overflow">
-            <tr>
-                <td>Temp</td>
-                <td>Name</td>
-                <td>Base (Actual) Display Rate</td>
-                <td>Remaining Shelf Life</td>
+                <td><strong>Temp</strong></td>
+                <td><strong>Name</strong></td>
+                <td><strong>Shelf Life (s)</strong></td>
             </tr>
         </table>
     </div>

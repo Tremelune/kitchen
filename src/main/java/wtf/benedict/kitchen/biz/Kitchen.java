@@ -12,8 +12,7 @@ import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 // TODO Cancel drivers.
 // TODO Include drivers in state.
 // TODO Per-order decay strategy.
-// TODO Display.
-// TODO Enterprisize. Event sourcing...caching...message bus...CQRS...nine microservices...
+// TODO There's a concurrency error somewhere.
 public class Kitchen {
   private final StorageAggregator storageAggregator;
   private final StorageFactory storageFactory;

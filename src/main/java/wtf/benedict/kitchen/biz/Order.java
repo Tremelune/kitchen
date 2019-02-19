@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import lombok.AllArgsConstructor;
 import lombok.val;
 
+// TODO Something isn't right with decay. Remaining shelf life should always drop by 1 every second.
 public class Order {
   private final List<RateChange> rateChanges = new ArrayList<>();
 
