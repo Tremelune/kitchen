@@ -47,9 +47,11 @@ class OverflowShelf {
         throw new StaleOrderException(order);
       }
 
-      // Make space and add the new order.
-      pullStalest(stalestOrder.getTemp()); // Discard stalest order. Happy birthday TO THE GROUND!
-      trash.add(stalestOrder);
+      // Make space by trashing the stalest order. Happy birthday TO THE GROUND!
+      val stalestOverflow = pullStalest(stalestOrder.getTemp());
+      trash.add(stalestOverflow);
+
+      // Add this new freshness.
       enqueuOrder(order);
     }
   }
