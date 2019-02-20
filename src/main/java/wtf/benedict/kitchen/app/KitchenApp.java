@@ -10,6 +10,11 @@ import io.dropwizard.setup.Environment;
 import lombok.extern.jbosslog.JBossLog;
 import lombok.val;
 
+/**
+ * DropWizard application class.
+ *
+ * It's effectively a Java Main class with some hardcoded values and DropWizard configuration.
+ */
 @JBossLog
 public class KitchenApp extends Application<KitchenConfig> {
   public static void main(String... ignored) throws Exception {
@@ -31,6 +36,8 @@ public class KitchenApp extends Application<KitchenConfig> {
     val sourceProvider = new ResourceConfigurationSourceProvider();
     bootstrap.setConfigurationSourceProvider(sourceProvider);
     bootstrap.addBundle(new WebJarBundle());
+
+    // This lets us serve files as a web application with no proxy.
     bootstrap.addBundle(new AssetsBundle("/assets/", "/", "index.html"));
   }
 

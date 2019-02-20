@@ -8,6 +8,7 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 import wtf.benedict.kitchen.biz.Trash.TrashListener;
 
+/** Receives and stores orders while coordinating with delivery drivers. */
 public class Kitchen {
   private final DriverDepot driverDepot;
   private final StorageAggregator storageAggregator;
@@ -26,12 +27,17 @@ public class Kitchen {
   }
 
 
+  /**
+   * @return State of the whole system, including waiting orders, shelves, trash, and delivery
+   * drivers.
+   */
   public StorageState getState() {
     val pickups = driverDepot.getState();
     return storageAggregator.getState(storage, pickups, trash);
   }
 
 
+  /** "Makes" an order, places it on the appropriate shelf, and sends for a driver to pick it up. */
   public void receiveOrder(Order order) {
     try {
       storage.put(order);
@@ -44,6 +50,7 @@ public class Kitchen {
   }
 
 
+  /** Resets drivers, shelves, and trash. */
   public void reset() {
     driverDepot.reset();
     trash.reset();
@@ -51,6 +58,7 @@ public class Kitchen {
   }
 
 
+  /** Pulls order from shelves by ID. */
   Order pickupOrder(long orderId) {
     return storage.pull(orderId);
   }

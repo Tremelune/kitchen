@@ -11,7 +11,11 @@ import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.Storage;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 
-/** Guice with no Guice. */
+/**
+ * Builds the dependency graph for the system.
+ *
+ * Guice without having to deal with Guice or another heavy dependency injection framework.
+ */
 class DependencyManager {
   final KitchenResource kitchenResource;
 

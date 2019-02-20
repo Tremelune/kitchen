@@ -14,6 +14,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 
+/**
+ * Handles the dispatch and cancellation of delivery drivers, while keeping track of their
+ * expected time of pickup.
+ */
 public class DriverDepot {
   private final Map<Long, Pickup> orderIdToPickup = new HashMap<>();
   private final Random random = new Random();
@@ -27,20 +31,24 @@ public class DriverDepot {
   }
 
 
+  /** "Sends" for a driver to come pickup up this order. */
   void schedulePickup(TimerTask pickupTask, Order order) {
     dispatchDriver(pickupTask, order);
   }
 
+  /** Cancels driver. They just...disappear... */
   synchronized void cancelPickup(long orderId) {
     orderIdToPickup.remove(orderId);
   }
 
 
+  /** @return State of "active" delivery drivers. */
   Map<Long, Pickup> getState() {
     return new HashMap<>(orderIdToPickup); // Hide the internal state from callers.
   }
 
 
+  /** Clears current driver/pickup state in preparation for a fresh start. */
   void reset() {
     orderIdToPickup.clear();
   }
@@ -67,7 +75,8 @@ public class DriverDepot {
 
 
   // Returns a delay in millis, between 2000-10000. If you want to slow everything in the app down
-  // to see what's really going on, increasing the delay and range here works well.
+  // to see what's really going on, increasing the delay and range here works well. This value is
+  // specified in the challenge.
   private int getPickupDelay() {
     val delay = random.nextInt(8) + 2;
     return delay * 1000;

@@ -2,6 +2,7 @@ package wtf.benedict.kitchen.biz;
 
 import java.util.Comparator;
 
+/** Sort by remaining shelf life. */
 class RemainingShelfLifeComparator {
   static final Comparator<Order> INSTANCE = newRemainingShelfLifeComparator();
 

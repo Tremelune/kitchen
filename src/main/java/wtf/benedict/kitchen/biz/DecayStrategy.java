@@ -1,5 +1,6 @@
 package wtf.benedict.kitchen.biz;
 
+/** Provides a mechanism for easily swapping decay stategies in and out on a per-order basis. */
 interface DecayStrategy {
   /** Sets a new decay rate moving forward. */
   void changeDecayRate(double rate);

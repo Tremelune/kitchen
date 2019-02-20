@@ -14,9 +14,15 @@ import wtf.benedict.kitchen.biz.OrderMessage;
 import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
 import wtf.benedict.kitchen.biz.Temperature;
 
+/**
+ * Places orders to the kitchen to be made and stored for pickup.
+ *
+ * Orders are placed with a Poisson Distribution at an average of 3.25 orders per second. This can
+ * be easily modified to change the rate of order placement.
+ */
 @AllArgsConstructor
 public class OrderGenerator {
-  private static final double ARRIVAL_AVERAGE = 3.25;
+  private static final double ARRIVAL_AVERAGE = 3.25; // Specified in challange.
 
   private final Clock clock;
   private final OrderLoader orderLoader;
@@ -25,6 +31,7 @@ public class OrderGenerator {
   private final Random random = new Random();
 
 
+  /** Pulls orders and places them according to our order placement strategy. */
   void generateOrders(Kitchen kitchen) {
     while (orderLoader.hasNext()) {
       scheduleOrderArrival(kitchen, orderLoader.next());
@@ -32,6 +39,7 @@ public class OrderGenerator {
   }
 
 
+  /** Clears already-loaded orders so they can be loaded fresh. */
   void reset() {
     orderLoader.reset();
   }

@@ -9,6 +9,7 @@ import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpiringMap;
 
+/** Push/pull queue that passively expires orders when their remaining shelf life drops to zero. */
 class OrderQueue {
   final ExpiringMap<Long, Order> orders;
 
@@ -31,6 +32,11 @@ class OrderQueue {
   }
 
 
+  /**
+   * Places an order in the queue, change its current decay rate.
+   *
+   * @throws OverflowException if the queue is at capacity.
+   */
   synchronized void put(Order order) throws OverflowException {
     if (orders.size() >= capacity) {
       throw new OverflowException(capacity);
@@ -41,21 +47,23 @@ class OrderQueue {
   }
 
 
+  /** Pulls order with the lowest remaining shelf life, removing it from the queue. */
   Order pullStalest() {
     return get(true, true);
   }
 
-  // Gets stalest order without removing it.
+  /** Gets order with the lowest remaining shelf life without removing it from the queue. */
   Order peekStalest() {
     return get(false, true);
   }
 
-  // Gets freshest order without removing it.
+  /** Gets order with the highest remaining shelf life without removing it from the queue. */
   Order peekFreshest() {
     return get(false, false);
   }
 
 
+  /** Pulls order by ID, removing it from the queue. */
   synchronized Order pull(long orderId) {
     val order = orders.get(orderId);
     orders.remove(orderId);
@@ -63,7 +71,6 @@ class OrderQueue {
   }
 
 
-  // Gets the stalest order.
   private synchronized Order get(boolean isPull, boolean findStalest) {
     if (isEmpty(orders.keySet())) {
       return null;
@@ -77,7 +84,7 @@ class OrderQueue {
   }
 
 
-  // Get stalest or freshest. If orders is empty, this will explode.
+  // Get stalest or freshest.
   private Order getMost(boolean stale) {
     val comparator = stale
         ? RemainingShelfLifeComparator.INSTANCE

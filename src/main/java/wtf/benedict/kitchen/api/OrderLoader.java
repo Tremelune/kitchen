@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OrderMessage;
 
+/** Loads emulated orders. They are static/constant. */
 public class OrderLoader {
   private static final Gson GSON = new Gson();
 
@@ -33,7 +34,12 @@ public class OrderLoader {
   }
 
 
-  // Ignore me doing this...
+  // Good ol' constants! These could have been pulled from a JSON file in the resources directory,
+  // but there is a chance that the classloader might not find it there depending on the
+  // environment, and it seemed wiser to just stuff them here instead of risking back-and-forth
+  // emails about why no orders exist...
+  //
+  // The  duplicates and typo are part of the challenge documents.
   private static final String ORDERS = "[\n" +
       "  {\n" +
       "    \"name\": \"Banana Split\",\n" +

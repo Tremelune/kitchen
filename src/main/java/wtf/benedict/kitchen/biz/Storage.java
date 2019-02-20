@@ -12,6 +12,7 @@ import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
+/** Holds all the shelves that hold all the orders. */
 public class Storage {
   private static final int TEMPERATURE_SHELF_CAPACITY = 15;
   private static final int OVERFLOW_CAPACITY = 20;
@@ -35,6 +36,10 @@ public class Storage {
   }
 
 
+  /**
+   * Adds order to the appropriate shelf. If it's full, something goes to overflow, based on how
+   * fresh it is.
+   */
   void put(Order order) throws StaleOrderException {
     val shelf = tempToShelf.get(order.getTemp());
     shelf.put(order);

@@ -2,6 +2,10 @@ package wtf.benedict.kitchen.biz;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Stateful object representing the values of a placed order as well as tracking its decay over
+ * time as it moves from shelf to shelf.
+ */
 public class Order {
   private final long id;
   private final String name;
@@ -28,15 +32,18 @@ public class Order {
   }
 
 
+  /** Sets a new decay rate moving forward. */
   void changeDecayRate(double rate) {
     decayStrategy.changeDecayRate(rate);
   }
 
 
+  /** Calculates remaining shelf life at the current decay rate (in seconds). */
   long calculateRemainingShelfLife() {
     return decayStrategy.calculateRemainingShelfLife(baseDecayRate, initialShelfLife);
   }
 
+  /** Calculates remaining shelf life for newRate (in seconds). */
   long calculateRemainingShelfLifeAt(double decayRate) {
     return decayStrategy.calculateRemainingShelfLifeAt(baseDecayRate, initialShelfLife, decayRate);
   }
@@ -61,6 +68,7 @@ public class Order {
   }
 
 
+  /** Ensures all required properties are accounted for in every order. */
   public static class Builder {
     private long id;
     private String name;

@@ -13,8 +13,13 @@ import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 
+/**
+ * Holds orders that the temperature shelves don't have space for.
+ *
+ * Decay rate is accelerated, and overflow from here winds up in the trash.
+ */
 class OverflowShelf {
-  static final int DECAY_RATE = 2;
+  static final int DECAY_RATE = 2; // Specified by the challenge.
 
   final Map<Temperature, OrderQueue> queues = new HashMap<>();
 
@@ -38,6 +43,12 @@ class OverflowShelf {
   }
 
 
+  /**
+   * Puts an order on the shelf. If the shelf is at-capacity, one of two things occur:
+   *
+   * 1) The stalest order is trashed and the incoming order is added.
+   * 2) The incoming order is the stalest, and it is rejected.
+   */
   synchronized void put(Order order) throws StaleOrderException {
     if (size < capacity) {
       enqueuOrder(order);
@@ -57,6 +68,7 @@ class OverflowShelf {
   }
 
 
+  /** Pulls the order with the lowest remaining shelf life by temperature. */
   synchronized Order pullStalest(Temperature temp) {
     val order = queues.get(temp).pullStalest();
     size--;
@@ -64,6 +76,7 @@ class OverflowShelf {
   }
 
 
+  /** Pulls the order by ID. We don't NEED temperature here, but it's convenient. */
   synchronized Order pull(Temperature temp, long orderId) {
     val order = queues.get(temp).pull(orderId);
     size--;

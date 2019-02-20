@@ -5,6 +5,10 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * This is what happens to food that is pished off all the shelves or isn't picked up before it
+ * expires.
+ */
 @AllArgsConstructor
 public class Trash {
   private final List<Order> orders = new ArrayList<>();

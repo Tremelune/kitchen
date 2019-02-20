@@ -19,6 +19,12 @@ import lombok.Data;
 import lombok.val;
 import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
 
+/**
+ * Aggregates the state of the system and bundles it up for serialization into a response.
+ *
+ * I could see separating the aggregation from the conversion to an API response, but so far this
+ * seems straightforward enough not to worry about it yet.
+ */
 public class StorageAggregator {
   StorageState getState(
       Storage storage, Map<Long, Pickup> orderIdToDelivery, Trash trash) {

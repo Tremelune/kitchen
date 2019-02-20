@@ -5,6 +5,7 @@ import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 
+/** Stores orders of a particular temperature. */
 class TemperatureShelf {
   private static final int DECAY_RATE = 1;
 
@@ -23,6 +24,13 @@ class TemperatureShelf {
   }
 
 
+  /**
+   * Adds order to the shelf. If the shelf is full, the freshest order is moved to the overflow
+   * shelf.
+   *
+   * @throws StaleOrderException if the order being added is staler than the stalest order on the
+   * overflow shelf.
+   */
   void put(Order order) throws StaleOrderException {
     if (order.getTemp() != temp){
       throw new IllegalArgumentException("Order temperature must be " + temp + ": " + order);
@@ -36,6 +44,10 @@ class TemperatureShelf {
   }
 
 
+  /**
+   * Pulls order by ID, removing it from the shelf. If there are orders of the matching temperature
+   * on the overflow shelf, they are pulled in.
+   */
   synchronized Order pull(long orderId) {
     Order order = queue.pull(orderId);
     if (order == null) {
@@ -65,6 +77,7 @@ class TemperatureShelf {
   }
 
 
+  // This finds the freshest order (including the new one passed in) and sends it to overflow.
   synchronized private void handleOverflow(Order order) throws StaleOrderException {
     val currentFreshest = queue.peekFreshest();
     if (currentFreshest == null) {
