@@ -2,7 +2,6 @@ package wtf.benedict.kitchen.biz;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-// TODO Something isn't right with decay. Remaining shelf life should always drop by 1 every second.
 public class Order {
   private final long id;
   private final String name;
