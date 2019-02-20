@@ -23,6 +23,7 @@ class OrderQueue {
 
     this.capacity = capacity;
     this.decayRateMultiplier = decayRateMultiplier;
+
     orders = ExpiringMap.builder()
         .variableExpiration()
         .expirationListener(expirationListener)
@@ -62,7 +63,7 @@ class OrderQueue {
   }
 
 
-  // Gets the stalest order. Synchronized to ensure nothing is removed mid-loop by another process.
+  // Gets the stalest order.
   private synchronized Order get(boolean isPull, boolean findStalest) {
     if (isEmpty(orders.keySet())) {
       return null;
@@ -76,7 +77,7 @@ class OrderQueue {
   }
 
 
-  // Get stalest or freshest. If freshOrders is empty, this will explode.
+  // Get stalest or freshest. If orders is empty, this will explode.
   private Order getMost(boolean stale) {
     val comparator = stale
         ? RemainingShelfLifeComparator.INSTANCE
