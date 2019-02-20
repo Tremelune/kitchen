@@ -16,7 +16,6 @@
 
     function writeShelfHeader(table) {
         var html =
-            "<td><strong>Temp</strong></td>" +
             "<td><strong>Name</strong></td>" +
             "<td><strong>Shelf Life (s)</strong></td>";
 
@@ -38,9 +37,18 @@
         writeShelfHeader(table);
 
         $.each(entries, function(i, entry) {
+            // Coincidentally, the BMW M colors...
+            var color;
+            if (entry.temp === "HOT") {
+                color = "#990000";
+            } else if (entry.temp === "COLD") {
+                color = "#000099";
+            } else if (entry.temp === "FROZEN") {
+                color = "#44eeff";
+            }
+
             var html =
-                "<td>" + entry.temp + "</td>" +
-                "<td><strong>" + entry.name + "</strong></td>" +
+                '<td><strong style="color:' + color + '">' + entry.name + '</strong></td>' +
                 "<td>" + entry.remainingShelfLife + "</td>";
 
             var row = document.createElement("tr");
@@ -114,21 +122,21 @@
         <table id="drivers"></table>
     </div>
 
-    <div>
-        <h3>OVERFLOW SHELF</h3>
-        <table id="overflow"></table>
-    </div>
-    <div>
+    <div style="float:left; margin:1em">
         <h3>HOT SHELF</h3>
         <table id="hot"></table>
     </div>
-    <div>
+    <div style="float:left; margin:1em">
         <h3>COLD SHELF</h3>
         <table id="cold"></table>
     </div>
-    <div>
+    <div style="float:left; margin:1em">
         <h3>FROZEN SHELF</h3>
         <table id="frozen"></table>
+    </div>
+    <div style="float:left; margin:1em">
+        <h3>OVERFLOW SHELF</h3>
+        <table id="overflow"></table>
     </div>
 </div>
 </body>
