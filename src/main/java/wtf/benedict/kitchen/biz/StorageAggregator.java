@@ -60,6 +60,7 @@ public class StorageAggregator {
 
   private static List<Entry> toEntries(Collection<Order> orders) {
     return orders.stream()
+        .sorted(RemainingShelfLifeComparator.INSTANCE)
         .map(StorageAggregator::toEntry)
         .collect(toList());
   }
