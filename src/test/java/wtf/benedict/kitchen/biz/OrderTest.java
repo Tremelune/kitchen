@@ -23,11 +23,11 @@ public class OrderTest {
 
     order.changeDecayRate(3);
     when(clock.instant()).thenReturn(TestUtil.instant(2019, 1, 1, 0, 0, 1));
-    assertEquals(85, order.calculateRemainingShelfLife()); // One second has "passed"
+    assertEquals(6, order.calculateRemainingShelfLife()); // One second has "passed"
 
     order.changeDecayRate(1);
     when(clock.instant()).thenReturn(TestUtil.instant(2019, 1, 1, 0, 0, 2));
-    assertEquals(80, order.calculateRemainingShelfLife()); // Two seconds have "passed"
+    assertEquals(16, order.calculateRemainingShelfLife()); // Two seconds have "passed"
   }
 
 
