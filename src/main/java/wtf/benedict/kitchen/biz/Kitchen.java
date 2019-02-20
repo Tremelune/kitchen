@@ -9,7 +9,6 @@ import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
-// TODO Cancel drivers.
 public class Kitchen {
   private final DriverDepot driverDepot;
   private final StorageAggregator storageAggregator;
@@ -69,7 +68,7 @@ public class Kitchen {
 
   private ExpirationListener<Long, Order> newExpirationListener() {
     return (id, order) -> {
-      // TODO Cancel driver.
+      driverDepot.cancelPickup(order.getId());
       trashedOrders.add(order);
     };
   }

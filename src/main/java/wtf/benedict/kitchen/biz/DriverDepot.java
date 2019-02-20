@@ -31,6 +31,10 @@ public class DriverDepot {
     dispatchDriver(pickupTask, order);
   }
 
+  synchronized void cancelPickup(long orderId) {
+    orderIdToPickup.remove(orderId);
+  }
+
 
   Map<Long, Pickup> getState() {
     return new HashMap<>(orderIdToPickup); // Hide the internal state from callers.
@@ -62,7 +66,8 @@ public class DriverDepot {
   }
 
 
-  // Returns a delay in millis, between 2000-10000.
+  // Returns a delay in millis, between 2000-10000. If you want to slow everything in the app down
+  // to see what's really going on, increasing the delay and range here works well.
   private int getPickupDelay() {
     val delay = random.nextInt(8) + 2;
     return delay * 1000;
