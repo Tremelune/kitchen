@@ -37,6 +37,16 @@ taken into account when determing the "normalized value" (remaining shelf life).
 
 • When an order is trashed, the delivery driver for that order is canceled.
 
+#### Overflow Strategy
+
+The overflow strategy is to try and maximize the freshness of orders and the number of orders that don't expire
+on the shelf. If the hot shelf is full and we place a new hot order, the order that will live the longest
+on the overflow shelf is the one that is put there. Decay rate and shelf life are both taken into account
+such that an order with a decay rate of .1 and a shelf life of 20 will go to the overflow before an order
+with a decay rate of 10 and a shelf life of 100.
+
+Orders are eagerly pulled from the overflow shelf immediately when space frees up on another shelf.
+
 ## Architecture
 
 I started out invisioning a CRUD app with datastores and caches and what not, and so the basic framework
