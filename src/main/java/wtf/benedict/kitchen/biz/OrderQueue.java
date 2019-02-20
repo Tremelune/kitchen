@@ -9,9 +9,8 @@ import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpiringMap;
 
-// TODO Notification of eviction.
 class OrderQueue {
-  final ExpiringMap<Long, Order> freshOrders;
+  final ExpiringMap<Long, Order> orders;
 
   private final int capacity;
   private final double decayRateMultiplier;
@@ -24,7 +23,7 @@ class OrderQueue {
 
     this.capacity = capacity;
     this.decayRateMultiplier = decayRateMultiplier;
-    freshOrders = ExpiringMap.builder()
+    orders = ExpiringMap.builder()
         .variableExpiration()
         .expirationListener(expirationListener)
         .build();
@@ -32,11 +31,12 @@ class OrderQueue {
 
 
   synchronized void put(Order order) throws OverflowException {
-    if (freshOrders.size() >= capacity) {
+    if (orders.size() >= capacity) {
       throw new OverflowException(capacity);
     }
 
-    freshOrders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
+    val remainingShelfLifeInThisQueue = order.calculateRemainingShelfLifeAt(decayRateMultiplier);
+    orders.put(order.getId(), order, remainingShelfLifeInThisQueue, SECONDS);
     order.changeDecayRate(decayRateMultiplier);
   }
 
@@ -57,21 +57,21 @@ class OrderQueue {
 
 
   synchronized Order pull(long orderId) {
-    val order = freshOrders.get(orderId);
-    freshOrders.remove(orderId);
+    val order = orders.get(orderId);
+    orders.remove(orderId);
     return order;
   }
 
 
   // Gets the stalest order. Synchronized to ensure nothing is removed mid-loop by another process.
   private synchronized Order get(boolean isPull, boolean findStalest) {
-    if (isEmpty(freshOrders.keySet())) {
+    if (isEmpty(orders.keySet())) {
       return null;
     }
 
     val order = getMost(findStalest);
     if (isPull) {
-      freshOrders.remove(order.getId());
+      orders.remove(order.getId());
     }
     return order;
   }
@@ -83,7 +83,7 @@ class OrderQueue {
         ? RemainingShelfLifeComparator.INSTANCE
         : RemainingShelfLifeComparator.INSTANCE.reversed();
 
-    val orders = new ArrayList<Order>(freshOrders.values());
+    val orders = new ArrayList<Order>(this.orders.values());
     orders.sort(comparator);
 
     return orders.iterator().next();

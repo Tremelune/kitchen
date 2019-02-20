@@ -29,7 +29,7 @@ public class StorageAggregator {
 
     val overflowEntries = new ArrayList<Entry>();
     for (OrderQueue queue : storage.overflowShelf.queues.values()) {
-      val entries = toEntries(queue.freshOrders.values());
+      val entries = toEntries(queue.orders.values());
       overflowEntries.addAll(entries);
     }
 
@@ -52,7 +52,7 @@ public class StorageAggregator {
 
 
   private static List<Entry> toEntries(Storage storage, Temperature temp) {
-    return toEntries(storage.tempToShelf.get(temp).queue.freshOrders.values());
+    return toEntries(storage.tempToShelf.get(temp).queue.orders.values());
   }
 
 
