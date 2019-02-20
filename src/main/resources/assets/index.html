@@ -14,6 +14,20 @@
     }
 
 
+    function getColor(order) {
+        // Coincidentally, the BMW M colors...
+        if (order.temp === "HOT") {
+            return "#990000";
+        } else if (order.temp === "COLD") {
+            return "#000099";
+        } else if (order.temp === "FROZEN") {
+            return "#44eeff";
+        } else {
+            return "#000000";
+        }
+    }
+
+
     function writeShelfHeader(table) {
         var html =
             "<td><strong>Name</strong></td>" +
@@ -37,15 +51,7 @@
         writeShelfHeader(table);
 
         $.each(entries, function(i, entry) {
-            // Coincidentally, the BMW M colors...
-            var color;
-            if (entry.temp === "HOT") {
-                color = "#990000";
-            } else if (entry.temp === "COLD") {
-                color = "#000099";
-            } else if (entry.temp === "FROZEN") {
-                color = "#44eeff";
-            }
+            var color = getColor(entry);
 
             var html =
                 '<td><strong style="color:' + color + '">' + entry.name + '</strong></td>' +
@@ -90,13 +96,32 @@
         });
     }
 
+    function writeTrash(entries) {
+        // Clear out old list
+        var trashDiv = document.getElementById("trash");
+        while (trashDiv.firstChild) {
+            trashDiv.removeChild(trashDiv.firstChild);
+        }
+
+        $.each(entries, function(i, entry) {
+            var color = getColor(entry);
+            var html = '<strong style="color:' + color + '">' + entry.name + '</strong>';
+
+            var row = document.createElement("div");
+            row.innerHTML = html;
+
+            trashDiv.appendChild(row);
+        });
+    }
+
     function writeState(state) {
         writeShelf("overflow", state.overflowEntries);
         writeShelf("hot", state.hotEntries);
         writeShelf("cold", state.coldEntries);
         writeShelf("frozen", state.frozenEntries);
 
-        writeDeliveries(state.pickups)
+        writeTrash(state.trashedEntries);
+        writeDeliveries(state.pickups);
     }
 
     function updateState() {
@@ -137,6 +162,10 @@
     <div style="float:left; margin:1em">
         <h3>OVERFLOW SHELF</h3>
         <table id="overflow"></table>
+    </div>
+    <div style="float:left; margin:1em">
+        <h3>TRASH</h3>
+        <div id="trash"></div>
     </div>
 </div>
 </body>

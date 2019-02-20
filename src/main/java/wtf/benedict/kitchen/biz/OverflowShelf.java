@@ -19,6 +19,7 @@ class OverflowShelf {
   final Map<Temperature, OrderQueue> queues = new HashMap<>();
 
   private final int capacity;
+  private final List<Order> trashedOrders;
 
   // The overflow shelf has a capacity that is spread across several order queues, so we keep track
   // of the true "size" of the shelf manually. This lets us fill up with orders of a single temp
@@ -26,12 +27,14 @@ class OverflowShelf {
   private int size;
 
 
-  OverflowShelf(int capacity, ExpirationListener<Long, Order> expirationListener) {
+  OverflowShelf(int capacity, ExpirationListener<Long, Order> expirationListener, List<Order> trashedOrders) {
     this.capacity = capacity;
 
     queues.put(HOT, new OrderQueue(capacity, DECAY_RATE, expirationListener));
     queues.put(COLD, new OrderQueue(capacity, DECAY_RATE, expirationListener));
     queues.put(FROZEN, new OrderQueue(capacity, DECAY_RATE, expirationListener));
+
+    this.trashedOrders = trashedOrders;
   }
 
 

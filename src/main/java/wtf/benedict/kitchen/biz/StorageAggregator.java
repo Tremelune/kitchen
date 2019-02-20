@@ -20,7 +20,9 @@ import lombok.val;
 import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
 
 public class StorageAggregator {
-  StorageState getState(Storage storage, Map<Long, Pickup> orderIdToDelivery) {
+  StorageState getState(
+      Storage storage, Map<Long, Pickup> orderIdToDelivery, List<Order> trashedOrders) {
+
     val hotEntries = toEntries(storage, HOT);
     val coldEntries = toEntries(storage, COLD);
     val frozenEntries = toEntries(storage, FROZEN);
@@ -36,12 +38,15 @@ public class StorageAggregator {
         .sorted(newPickupComparator())
         .collect(toList());
 
+    val trashedEntries = trashedOrders.stream().map(StorageAggregator::toEntry).collect(toList());
+
     return StorageState.builder()
         .hotEntries(hotEntries)
         .coldEntries(coldEntries)
         .frozenEntries(frozenEntries)
         .overflowEntries(overflowEntries)
         .pickups(pickups)
+        .trashedEntries(trashedEntries)
         .build();
   }
 
@@ -59,6 +64,14 @@ public class StorageAggregator {
 
 
   private static Entry toEntry(Order order) {
+    // TODO This should never happen. has to be concurrency stuff.
+    if (order == null) {
+      return Entry.builder()
+          .name("NULL")
+          .temp(null)
+          .remainingShelfLife(-1)
+          .build();
+    }
     return Entry.builder()
         .name(order.getName())
         .temp(order.getTemp())
@@ -88,6 +101,7 @@ public class StorageAggregator {
     private List<Entry> coldEntries;
     private List<Entry> frozenEntries;
     private List<Entry> overflowEntries;
+    private List<Entry> trashedEntries;
     private List<ScheduledPickup> pickups;
   }
 

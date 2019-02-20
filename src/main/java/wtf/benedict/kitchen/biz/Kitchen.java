@@ -1,5 +1,7 @@
 package wtf.benedict.kitchen.biz;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
 
 import lombok.val;
@@ -14,6 +16,8 @@ public class Kitchen {
   private final StorageAggregator storageAggregator;
   private final StorageFactory storageFactory;
 
+  private final List<Order> trashedOrders = new ArrayList<>();
+
   private Storage storage;
 
 
@@ -27,7 +31,7 @@ public class Kitchen {
 
   public StorageState getState() {
     val pickups = driverDepot.getState();
-    return storageAggregator.getState(storage, pickups);
+    return storageAggregator.getState(storage, pickups, trashedOrders);
   }
 
 
@@ -35,8 +39,7 @@ public class Kitchen {
     try {
       storage.put(order);
     } catch (StaleOrderException e) {
-      val message = String.format("Refund customer! Order is too stale: %s", order);
-      throw new IllegalArgumentException(message);
+      trashedOrders.add(order);
     }
 
     val pickupTask = newPickupTask(this, order.getId());
@@ -46,7 +49,8 @@ public class Kitchen {
 
   public void reset() {
     driverDepot.reset();
-    storage = storageFactory.newStorage(newExpirationListener());
+    trashedOrders.clear();
+    storage = storageFactory.newStorage(newExpirationListener(), trashedOrders);
   }
 
 
@@ -66,7 +70,8 @@ public class Kitchen {
 
   private ExpirationListener<Long, Order> newExpirationListener() {
     return (id, order) -> {
-      // TODO
+      // TODO Cancel driver.
+      trashedOrders.add(order);
     };
   }
 }

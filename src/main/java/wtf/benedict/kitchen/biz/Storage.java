@@ -4,6 +4,7 @@ import static wtf.benedict.kitchen.biz.Temperature.COLD;
 import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -21,16 +22,16 @@ public class Storage {
   private final ExpirationListener<Long, Order> expirationListener;
 
 
-  public Storage(ExpirationListener<Long, Order> expirationListener) {
+  public Storage(ExpirationListener<Long, Order> expirationListener, List<Order> trashedOrders) {
     this.expirationListener = expirationListener;
 
-    overflowShelf = new OverflowShelf(OVERFLOW_CAPACITY, expirationListener);
+    overflowShelf = new OverflowShelf(OVERFLOW_CAPACITY, expirationListener, trashedOrders);
 
     // This must happen after expirationListener and overflowSHelf are initialized.
     tempToShelf = ImmutableMap.of(
-        HOT, newShelf(HOT),
-        COLD, newShelf(COLD),
-        FROZEN, newShelf(FROZEN)
+        HOT, newShelf(HOT, trashedOrders),
+        COLD, newShelf(COLD, trashedOrders),
+        FROZEN, newShelf(FROZEN, trashedOrders)
     );
   }
 
@@ -55,8 +56,8 @@ public class Storage {
   }
 
 
-  private TemperatureShelf newShelf(Temperature temp) {
+  private TemperatureShelf newShelf(Temperature temp, List<Order> trashedOrders) {
     return new TemperatureShelf(
-        TEMPERATURE_SHELF_CAPACITY, overflowShelf, temp, expirationListener);
+        TEMPERATURE_SHELF_CAPACITY, overflowShelf, temp, expirationListener, trashedOrders);
   }
 }

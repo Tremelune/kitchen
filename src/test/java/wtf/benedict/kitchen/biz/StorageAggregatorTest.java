@@ -10,6 +10,7 @@ import static wtf.benedict.kitchen.biz.Temperature.HOT;
 import static wtf.benedict.kitchen.test.TestUtil.assertSize;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class StorageAggregatorTest {
 
   @Test
   public void getState() throws Exception {
-    Storage storage = new Storage((id, order) -> {});
+    Storage storage = new Storage((id, order) -> {}, new ArrayList<>());
 
     val a = newOrder(10, "a", HOT, 100);
     val b = newOrder(11, "b", COLD, 50);
@@ -46,7 +47,7 @@ public class StorageAggregatorTest {
       put(10L, new Pickup(a, Instant.now().plusSeconds(100)));
     }};
 
-    val state = storageAggregator.getState(storage, orderIdToDelivery);
+    val state = storageAggregator.getState(storage, orderIdToDelivery, new ArrayList<>());
 
     assertEquals(1, state.getHotEntries().size());
     assertEquals("a", state.getHotEntries().get(0).getName());
@@ -71,13 +72,13 @@ public class StorageAggregatorTest {
 
   @Test
   public void getState_overflow() throws Exception {
-    Storage storage = new Storage((id, order) -> {});
+    Storage storage = new Storage((id, order) -> {}, new ArrayList<>());
 
     overFlowOrders(storage, 10, HOT);
     overFlowOrders(storage, 20, COLD);
     overFlowOrders(storage, 30, FROZEN);
 
-    val state = storageAggregator.getState(storage, emptyMap());
+    val state = storageAggregator.getState(storage, emptyMap(), new ArrayList<>());
 
     // Order isn't guaranteed, so just see if they're there...
     assertEquals(3, state.getOverflowEntries().size());

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
 import java.time.Clock;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -132,10 +133,10 @@ public class TemperatureShelfTest {
 
   private static OverflowShelf newOverflowShelf() {
     // Capacity is arbitrary, but enough for tests
-    return new OverflowShelf(10, (id, order) -> {});
+    return new OverflowShelf(10, (id, order) -> {}, new ArrayList<>());
   }
 
   private static TemperatureShelf newTemperatureShelf(OverflowShelf overflowShelf) {
-    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {});
+    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {}, new ArrayList<>());
   }
 }

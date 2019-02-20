@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -25,8 +27,8 @@ public class KitchenTest {
 
   @Test
   public void orderShouldBeFoundById() {
-    Storage storage = new Storage((id, order) -> {});
-    val underTest = new Kitchen(driverDepot, null, (expirationListener) -> storage);
+    Storage storage = new Storage((id, order) -> {}, new ArrayList<>());
+    val underTest = new Kitchen(driverDepot, null, (expirationListener, trashedOrders) -> storage);
 
     assertNull(underTest.pickupOrder(1337));
 
@@ -47,7 +49,7 @@ public class KitchenTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void rejectedOrderShouldGetRefund() throws Exception {
-    val underTest = new Kitchen(driverDepot, null, (expirationListener) -> storage);
+    val underTest = new Kitchen(driverDepot, null, (expirationListener, trashedOrders) -> storage);
     doThrow(new StaleOrderException(null)).when(storage).put(any());
 
     underTest.receiveOrder(null);
