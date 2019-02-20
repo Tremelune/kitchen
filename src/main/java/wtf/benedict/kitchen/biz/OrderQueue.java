@@ -31,7 +31,7 @@ class OrderQueue {
   }
 
 
-  void put(Order order) throws OverflowException {
+  synchronized void put(Order order) throws OverflowException {
     if (freshOrders.size() >= capacity) {
       throw new OverflowException(capacity);
     }
@@ -56,7 +56,7 @@ class OrderQueue {
   }
 
 
-  Order pull(long orderId) {
+  synchronized Order pull(long orderId) {
     val order = freshOrders.get(orderId);
     freshOrders.remove(orderId);
     return order;

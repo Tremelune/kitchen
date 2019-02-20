@@ -38,7 +38,7 @@ class OverflowShelf {
   }
 
 
-  void put(Order order) throws StaleOrderException {
+  synchronized void put(Order order) throws StaleOrderException {
     if (size < capacity) {
       enqueuOrder(order);
     } else {
@@ -49,19 +49,20 @@ class OverflowShelf {
 
       // Make space and add the new order.
       pullStalest(stalestOrder.getTemp()); // Discard stalest order. Happy birthday TO THE GROUND!
+      trashedOrders.add(stalestOrder);
       enqueuOrder(order);
     }
   }
 
 
-  Order pullStalest(Temperature temp) {
+  synchronized Order pullStalest(Temperature temp) {
     val order = queues.get(temp).pullStalest();
     size--;
     return order;
   }
 
 
-  Order pull(Temperature temp, long orderId) {
+  synchronized Order pull(Temperature temp, long orderId) {
     val order = queues.get(temp).pull(orderId);
     size--;
     return order;

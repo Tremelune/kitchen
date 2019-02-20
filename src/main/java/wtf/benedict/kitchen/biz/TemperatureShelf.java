@@ -37,7 +37,7 @@ class TemperatureShelf {
   }
 
 
-  Order pull(long orderId) {
+  synchronized Order pull(long orderId) {
     Order order = queue.pull(orderId);
     if (order == null) {
       // No order here...but check overflow for it, but don't try and pull more from there...
@@ -61,7 +61,7 @@ class TemperatureShelf {
   }
 
 
-  private void handleOverflow(Order order) throws StaleOrderException {
+  synchronized private void handleOverflow(Order order) throws StaleOrderException {
     val currentFreshest = queue.peekFreshest();
     if (currentFreshest == null) {
       overflowShelf.put(order);
