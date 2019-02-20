@@ -10,7 +10,7 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 // TODO Cancel drivers.
-// TODO There's a concurrency error somewhere.
+// TODO If an order expires, the shelf doesn't pull from overflow.
 public class Kitchen {
   private final DriverDepot driverDepot;
   private final StorageAggregator storageAggregator;
