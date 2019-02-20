@@ -38,8 +38,6 @@ public class OrderLoader {
   // but there is a chance that the classloader might not find it there depending on the
   // environment, and it seemed wiser to just stuff them here instead of risking back-and-forth
   // emails about why no orders exist...
-  //
-  // The  duplicates and typo are part of the challenge documents.
   private static final String ORDERS = "[\n" +
       "  {\n" +
       "    \"name\": \"Banana Split\",\n" +
