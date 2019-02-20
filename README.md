@@ -8,6 +8,10 @@ The easiest way to get the code is probably to checkout the repo from GitHub:
 
 https://github.com/Tremelune/kitchen.git
 
+`$ git clone https://github.com/Tremelune/kitchen.git`
+
+`$ cd kitchen`
+
 Then, to build:
 
 `$ mvn clean package`
