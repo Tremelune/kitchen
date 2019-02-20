@@ -105,4 +105,4 @@ points there. I didn't want to try and unpack/tweak/rewrite these classes...
 
 ## License
 
-Whatever, man. Do as thou wilt.
+Whatever, yo. Do as thou wilt.
