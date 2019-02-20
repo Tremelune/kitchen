@@ -29,7 +29,7 @@ public class Order {
 
 
   void changeDecayRate(double rate) {
-    decayStrategy.modifyDecayRate(rate);
+    decayStrategy.changeDecayRate(rate);
   }
 
 

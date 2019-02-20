@@ -19,7 +19,7 @@ public class CumulativeDecayStrategy implements DecayStrategy {
 
 
   @Override
-  public void modifyDecayRate(double rate) {
+  public void changeDecayRate(double rate) {
     rateChanges.add(new RateChange(clock.instant(), rate));
   }
 
