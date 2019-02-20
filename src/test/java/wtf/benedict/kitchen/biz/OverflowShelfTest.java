@@ -56,19 +56,6 @@ public class OverflowShelfTest {
   }
 
 
-  // TODO I forget if we still do this.
-//  @Test(expected = StaleOrderException.class)
-  public void overflowShouldRejectNewOrderIfItsStalest() throws Exception {
-    val underTest = new OverflowShelf(2, (id, order) -> {}, trash);
-
-    val fresh = newOrder(10, HOT, 200);
-    val stale = newOrder(11, HOT, 100);
-
-    underTest.put(fresh);
-    underTest.put(stale);
-  }
-
-
   @Test
   public void overflowShouldDiscardStalest() throws Exception {
     val underTest = new OverflowShelf(1, (id, order) -> {}, trash);
