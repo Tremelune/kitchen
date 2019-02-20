@@ -31,11 +31,13 @@ on a per-order basis.
 
 • Depletion from decay is tracked over time for each shelf the order spends time on. If it is moved to the overflow
 shelf and then back to the frozen shelf, the depletion for the accelrated decay on the overflow shelf is
-taken into account when determing the "normalized value" (remaining shelf life).
+taken into account when determing the remaining shelf life ("normalized value").
 
 • If an order times out or gets pushed off all shelves, it is stored in a trash that is displayed.
 
 • When an order is trashed, the delivery driver for that order is canceled.
+
+• Delivery drivers are tracked by time-until-pickup.
 
 #### Overflow Strategy
 
@@ -45,7 +47,11 @@ on the overflow shelf is the one that is put there. Decay rate and shelf life ar
 such that an order with a decay rate of .1 and a shelf life of 20 will go to the overflow before an order
 with a decay rate of 10 and a shelf life of 100.
 
-Orders are eagerly pulled from the overflow shelf immediately when space frees up on another shelf.
+Orders are eagerly pulled from the overflow shelf when space frees up on another shelf.
+
+The theory is that by keeping the longest-living orders on the overflow, there will be fewer overall
+trashed orders. It may be that coordination between driver pickup time and shelf life is the better way
+to go, but without tracking metrics, we'll never know for sure...
 
 ## Architecture
 
@@ -68,12 +74,13 @@ they're mixed together.
 
 Similarly, you don't want the logic that controls how your state is stored (database or memory) to be
 intermingled with your business logic. DAOs and clients to 3rd party apps shouldn't know about each other
-and they should know how to figure out if an account is active or expired or what.
+and they shouldn't know how to figure out if an account is active or expired or what.
 
 For this app, that last bit is kinda loose. Since there's no persistence layer, it seemed overly complex
 to break maps and sets out into their own tier with DAOs and what not, so they're a bit mixed in with
 logic relevant to them. I tried to err on the side of a self-contained DDD aggregate that has control over its
-own data. Some things were exploded a bit for serialization/display, as this seemed like a pragmatic approach.
+own data. Some things were exploded a bit for serialization, as this seemed like a pragmatic approach
+for display.
 
 #### Coupling
 
@@ -83,8 +90,8 @@ up being some pretty deep injection of listeners to coordinate what should happe
 (such as dispatching drivers, canceling drivers, re-balancing the overflow shelf when room frees up on 
 the cold shelf, dropping orders in the trash when they expire, etc, etc).
 
-In retrospect, this would have been more decoupled, and probably simpler to have built on an event bus in mind.
-Shout out to the year I spent building Android apps for Squarespace.
+In retrospect, this probably would have been more decoupled to have built it on an event bus. Shout
+out to the year I spent building Android apps for Squarespace.
 
 #### Time
 
