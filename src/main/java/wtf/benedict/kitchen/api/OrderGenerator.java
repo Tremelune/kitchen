@@ -50,7 +50,6 @@ public class OrderGenerator {
     return new TimerTask() {
       @Override
       public void run() {
-        System.out.println("#### RECEVIING " + order);
         kitchen.receiveOrder(order);
       }
     };
