@@ -14,7 +14,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <mainClass>wtf.benedict.kitchen.app.App</mainClass>
+    <mainClass>wtf.benedict.kitchen.app.KitchenApp</mainClass>
     <dropwizard.version>1.3.1</dropwizard.version>
   </properties>
 
