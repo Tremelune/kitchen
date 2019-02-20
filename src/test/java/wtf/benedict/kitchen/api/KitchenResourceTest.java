@@ -12,7 +12,6 @@ import static wtf.benedict.kitchen.test.TestUtil.asList;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -34,13 +33,6 @@ public class KitchenResourceTest {
 
   @Rule
   public final ResourceTestRule rule = ResourceTestRule.builder().addResource(underTest).build();
-
-
-  @Before
-  public void setup() {
-    // TODO Bother with this?
-//    ObjectMapperConfigurer.configure(rule.getObjectMapper());
-  }
 
 
   @Test

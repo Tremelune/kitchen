@@ -8,7 +8,6 @@ import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 
 // TODO Cancel drivers.
-// TODO Per-order decay strategy.
 // TODO There's a concurrency error somewhere.
 public class Kitchen {
   private final DriverDepot driverDepot;
