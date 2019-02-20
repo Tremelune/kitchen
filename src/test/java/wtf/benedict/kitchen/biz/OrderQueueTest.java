@@ -79,8 +79,8 @@ public class OrderQueueTest {
 
   @Test
   public void expiration() throws Exception {
-    val fresh = newOrder(10, 2);
-    val stale = newOrder(11, 1);
+    val fresh = newOrder(10, 3);
+    val stale = newOrder(11, 2);
 
     val underTest = new OrderQueue(2, 1, (id, order) -> {});
     underTest.put(stale);
