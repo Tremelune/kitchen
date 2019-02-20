@@ -17,7 +17,8 @@ class TemperatureShelf {
 
 
   TemperatureShelf(int capacity, OverflowShelf overflowShelf, Temperature temp, ExpirationListener<Long, Order> expirationListener, List<Order> trashedOrders) {
-    this.queue = new OrderQueue(capacity, DECAY_RATE, expirationListener);
+    val listener = wrapListener(expirationListener);
+    this.queue = new OrderQueue(capacity, DECAY_RATE, listener);
     this.overflowShelf = overflowShelf;
     this.temp = temp;
     this.trashedOrders = trashedOrders;
@@ -44,8 +45,15 @@ class TemperatureShelf {
       return overflowShelf.pull(temp, orderId);
     }
 
-    // We have space now, so see if we can grab stuff from overflow. That stuff is decaying rapidly.
-    val overflowOrder = overflowShelf.pullStalest(order.getTemp());
+    balanceFromOverflow(order.getTemp());
+
+    return order;
+  }
+
+
+  // We have space now, so see if we can grab stuff from overflow. That stuff is decaying rapidly.
+  private void balanceFromOverflow(Temperature temp) {
+    val overflowOrder = overflowShelf.pullStalest(temp);
     if (overflowOrder != null) {
       try {
         put(overflowOrder);
@@ -56,8 +64,6 @@ class TemperatureShelf {
         trashedOrders.add(overflowOrder);
       }
     }
-
-    return order;
   }
 
 
@@ -84,5 +90,15 @@ class TemperatureShelf {
       // another order sneaks in, it is correct to run through the overflow logic again.
       put(order);
     }
+  }
+
+
+  // This makes sure we grab from overflow when space frees up due to passive expiration...This
+  // will only actually happen if we increase the pickup delay from the specs of the challenge.
+  private ExpirationListener<Long, Order> wrapListener(ExpirationListener<Long, Order> listener) {
+    return (id, order) -> {
+      listener.expired(id, order);
+      balanceFromOverflow(order.getTemp());
+    };
   }
 }
