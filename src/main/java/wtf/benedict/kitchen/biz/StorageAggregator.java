@@ -21,7 +21,7 @@ import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
 
 public class StorageAggregator {
   StorageState getState(
-      Storage storage, Map<Long, Pickup> orderIdToDelivery, List<Order> trashedOrders) {
+      Storage storage, Map<Long, Pickup> orderIdToDelivery, Trash trash) {
 
     val hotEntries = toEntries(storage, HOT);
     val coldEntries = toEntries(storage, COLD);
@@ -38,7 +38,9 @@ public class StorageAggregator {
         .sorted(newPickupComparator())
         .collect(toList());
 
-    val trashedEntries = trashedOrders.stream().map(StorageAggregator::toEntry).collect(toList());
+    val trashedEntries = trash.getOrders().stream()
+        .map(StorageAggregator::toEntry)
+        .collect(toList());
 
     return StorageState.builder()
         .hotEntries(hotEntries)

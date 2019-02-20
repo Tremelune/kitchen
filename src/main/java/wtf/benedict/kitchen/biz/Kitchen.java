@@ -1,20 +1,19 @@
 package wtf.benedict.kitchen.biz;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimerTask;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
+import wtf.benedict.kitchen.biz.Trash.TrashListener;
 
 public class Kitchen {
   private final DriverDepot driverDepot;
   private final StorageAggregator storageAggregator;
   private final StorageFactory storageFactory;
 
-  private final List<Order> trashedOrders = new ArrayList<>();
+  private final Trash trash = new Trash(newTrashListener());
 
   private Storage storage;
 
@@ -29,7 +28,7 @@ public class Kitchen {
 
   public StorageState getState() {
     val pickups = driverDepot.getState();
-    return storageAggregator.getState(storage, pickups, trashedOrders);
+    return storageAggregator.getState(storage, pickups, trash);
   }
 
 
@@ -37,7 +36,7 @@ public class Kitchen {
     try {
       storage.put(order);
     } catch (StaleOrderException e) {
-      trashedOrders.add(order);
+      trash.add(order);
     }
 
     val pickupTask = newPickupTask(this, order.getId());
@@ -47,8 +46,8 @@ public class Kitchen {
 
   public void reset() {
     driverDepot.reset();
-    trashedOrders.clear();
-    storage = storageFactory.newStorage(newExpirationListener(), trashedOrders);
+    trash.reset();
+    storage = storageFactory.newStorage(newExpirationListener(), trash);
   }
 
 
@@ -69,7 +68,12 @@ public class Kitchen {
   private ExpirationListener<Long, Order> newExpirationListener() {
     return (id, order) -> {
       driverDepot.cancelPickup(order.getId());
-      trashedOrders.add(order);
+      trash.add(order);
     };
+  }
+
+
+  private TrashListener newTrashListener() {
+    return order -> driverDepot.cancelPickup(order.getId());
   }
 }

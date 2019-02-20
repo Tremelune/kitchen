@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,7 +22,7 @@ public class KitchenTest {
 
   @Test
   public void orderShouldBeFoundById() {
-    Storage storage = new Storage((id, order) -> {}, new ArrayList<>());
+    Storage storage = new Storage((id, order) -> {}, new Trash(null));
     val underTest = new Kitchen(driverDepot, null, (expirationListener, trashedOrders) -> storage);
 
     assertNull(underTest.pickupOrder(1337));

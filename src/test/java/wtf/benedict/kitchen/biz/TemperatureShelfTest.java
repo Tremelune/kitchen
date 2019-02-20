@@ -133,10 +133,10 @@ public class TemperatureShelfTest {
 
   private static OverflowShelf newOverflowShelf() {
     // Capacity is arbitrary, but enough for tests
-    return new OverflowShelf(10, (id, order) -> {}, new ArrayList<>());
+    return new OverflowShelf(10, (id, order) -> {}, new Trash(null));
   }
 
   private static TemperatureShelf newTemperatureShelf(OverflowShelf overflowShelf) {
-    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {}, new ArrayList<>());
+    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {}, new Trash(null));
   }
 }

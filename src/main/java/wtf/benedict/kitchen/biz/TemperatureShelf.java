@@ -1,7 +1,5 @@
 package wtf.benedict.kitchen.biz;
 
-import java.util.List;
-
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
@@ -13,15 +11,15 @@ class TemperatureShelf {
   final OrderQueue queue;
   private final OverflowShelf overflowShelf;
   private final Temperature temp;
-  private final List<Order> trashedOrders;
+  private final Trash trash;
 
 
-  TemperatureShelf(int capacity, OverflowShelf overflowShelf, Temperature temp, ExpirationListener<Long, Order> expirationListener, List<Order> trashedOrders) {
+  TemperatureShelf(int capacity, OverflowShelf overflowShelf, Temperature temp, ExpirationListener<Long, Order> expirationListener, Trash trash) {
     val listener = wrapListener(expirationListener);
     this.queue = new OrderQueue(capacity, DECAY_RATE, listener);
     this.overflowShelf = overflowShelf;
     this.temp = temp;
-    this.trashedOrders = trashedOrders;
+    this.trash = trash;
   }
 
 
@@ -61,7 +59,7 @@ class TemperatureShelf {
         // If this happens, it means another order was added to overflow between the pull and put
         // above, and the order we just pulled from overflow is now the stalest...which means it
         // should be discarded.
-        trashedOrders.add(overflowOrder);
+        trash.add(overflowOrder);
       }
     }
   }

@@ -6,8 +6,6 @@ import static wtf.benedict.kitchen.biz.Temperature.COLD;
 import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 
 import lombok.val;
@@ -16,7 +14,7 @@ import wtf.benedict.kitchen.test.TestUtil;
 public class StorageTest {
   @Test
   public void orderShouldBeFoundById() throws Exception {
-    val underTest = new Storage((id, order) -> {}, new ArrayList<>());
+    val underTest = new Storage((id, order) -> {}, new Trash(null));
 
     val hot = newOrder(10, HOT);
     val cold = newOrder(11, COLD);
