@@ -35,9 +35,8 @@ class OrderQueue {
       throw new OverflowException(capacity);
     }
 
-    val remainingShelfLifeInThisQueue = order.calculateRemainingShelfLifeAt(decayRateMultiplier);
-    orders.put(order.getId(), order, remainingShelfLifeInThisQueue, SECONDS);
     order.changeDecayRate(decayRateMultiplier);
+    orders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
   }
 
 
