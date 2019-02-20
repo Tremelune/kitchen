@@ -64,14 +64,6 @@ public class StorageAggregator {
 
 
   private static Entry toEntry(Order order) {
-    // TODO This should never happen. has to be concurrency stuff.
-    if (order == null) {
-      return Entry.builder()
-          .name("NULL")
-          .temp(null)
-          .remainingShelfLife(-1)
-          .build();
-    }
     return Entry.builder()
         .name(order.getName())
         .temp(order.getTemp())
