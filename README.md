@@ -86,17 +86,6 @@ logic relevant to them. I tried to err on the side of a self-contained DDD aggre
 own data. Some things were exploded a bit for serialization, as this seemed like a pragmatic approach
 for display.
 
-#### Coupling
-
-After having built this thing, I'm seeing that there is more coupling of the objects that store
-state than I'd like—the temperature shelves know about the overflow shelf, and everybody knows about the trash. There wound
-up being some pretty deep injection of listeners to coordinate what should happen when an order is placed or is "dead"
-(such as dispatching drivers, canceling drivers, re-balancing the overflow shelf when room frees up on 
-the cold shelf, dropping orders in the trash when they expire, etc, etc).
-
-In retrospect, this probably would have been more decoupled to have built it on an event bus. Shout
-out to the year I spent building Android apps for Squarespace.
-
 #### Time
 
 Time is always tricky. Wherever possible, I tried to pass a Clock around so I could control time in tests,
