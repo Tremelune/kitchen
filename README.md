@@ -22,6 +22,8 @@ Then, to run:
 
 Then, point a web browser to [localhost:8080](http://localhost.com:8080/) and press the "Generate
  orders" button.
+ 
+Later versions of Java and Maven may work, but I used Java 1.8 and Maven 3.5.
 
 #### Speed
 
