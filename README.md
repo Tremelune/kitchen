@@ -92,6 +92,10 @@ Time is always tricky. Wherever possible, I tried to pass a Clock around so I co
 but enough of the system relied on system time (Timer, and the ExpiringMap) that there are still some pain
 points there. I didn't want to try and unpack/tweak/rewrite these classes...
 
+## User Interface
+
+This is super rudamentary and simply polls the server to get the state of the system and render it into something comprehensible by humans. It utilizes the hottest UI framework trend: Vanilla JS with a smattering of old jQuery...
+
 ## License
 
 Whatever, yo. Do as thou wilt.
