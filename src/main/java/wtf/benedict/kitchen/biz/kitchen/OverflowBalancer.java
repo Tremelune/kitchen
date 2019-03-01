@@ -13,7 +13,7 @@ public class OverflowBalancer {
 
 
   /** Pulls orders from overflow and adds them to the temperature shelf, if possible. */
-  void balance(TemperatureShelf shelf, Temperature temp) {
+  void balance(Shelf shelf, Temperature temp) {
     val overflowOrder = overflowShelf.pullStalest(temp);
     if (overflowOrder != null) {
       try {

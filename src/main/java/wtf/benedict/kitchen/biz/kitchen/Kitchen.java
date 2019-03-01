@@ -12,7 +12,7 @@ import wtf.benedict.kitchen.data.Order;
   @AllArgsConstructor
 public class Kitchen {
   private final DriverDepot driverDepot;
-  private final TemperatureShelf shelf;
+  private final Shelf shelf;
   private final Trash trash;
 
 

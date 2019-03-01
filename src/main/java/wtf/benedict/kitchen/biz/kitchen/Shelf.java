@@ -9,7 +9,7 @@ import wtf.benedict.kitchen.data.storage.ShelfStorage;
 
 /** Stores orders of a particular temperature. */
 @AllArgsConstructor
-public class TemperatureShelf {
+public class Shelf {
   private final double overflowDecayRate;
   private final OverflowBalancer overflowBalancer;
   private final OverflowShelf overflowShelf;

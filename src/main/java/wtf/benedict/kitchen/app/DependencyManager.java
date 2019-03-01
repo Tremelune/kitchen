@@ -21,7 +21,7 @@ import wtf.benedict.kitchen.biz.kitchen.OverflowShelf;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageResetter;
-import wtf.benedict.kitchen.biz.kitchen.TemperatureShelf;
+import wtf.benedict.kitchen.biz.kitchen.Shelf;
 import wtf.benedict.kitchen.biz.kitchen.Trash;
 import wtf.benedict.kitchen.data.storage.TrashStorage;
 
@@ -49,7 +49,7 @@ class DependencyManager {
 
     val overflowShelf = new OverflowShelf(overflowStorage, trash, OVERFLOW_CAPACITY);
     val overflowBalancer = new OverflowBalancer(overflowShelf, trash);
-    val shelf = new TemperatureShelf(OVERFLOW_DECAY_RATE, overflowBalancer, overflowShelf, shelfStorage);
+    val shelf = new Shelf(OVERFLOW_DECAY_RATE, overflowBalancer, overflowShelf, shelfStorage);
     val kitchen = new Kitchen(driverDepot, shelf, trash);
     val storageAggregator = new StorageAggregator(driverStorage, overflowStorage, shelfStorage, trashStorage);
     val storageResetter = new StorageResetter(driverStorage, overflowStorage, shelfStorage, trashStorage);

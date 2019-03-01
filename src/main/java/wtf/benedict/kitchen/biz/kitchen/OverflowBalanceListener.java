@@ -10,12 +10,12 @@ import wtf.benedict.kitchen.data.Order;
 public class OverflowBalanceListener implements ExpirationListener<Long, Order> {
   private final ExpirationListener<Long, Order> expirationListener;
   private final OverflowBalancer overflowBalancer;
-  private final TemperatureShelf temperatureShelf;
+  private final Shelf shelf;
 
 
   @Override
   public void expired(Long orderId, Order order) {
     expirationListener.expired(orderId, order);
-    overflowBalancer.balance(temperatureShelf, order.getTemp());
+    overflowBalancer.balance(shelf, order.getTemp());
   }
 }
