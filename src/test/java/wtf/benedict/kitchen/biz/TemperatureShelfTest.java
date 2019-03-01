@@ -4,22 +4,47 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static wtf.benedict.kitchen.biz.Temperature.COLD;
+import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
 import static wtf.benedict.kitchen.biz.Temperature.HOT;
 
 import java.time.Clock;
-import java.util.ArrayList;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.test.TestUtil;
 
+
+
+@RunWith(MockitoJUnitRunner.class)
 public class TemperatureShelfTest {
+  @Mock
+  private ExpirationListener<Long, Order> expirationListener;
+  @Mock
+  private Trash trash;
+
+  private OverflowShelf overflowShelf;
+  private TemperatureShelf underTest;
+
+
+  @Before
+  public void setUp() {
+    val shelfStorage = new ShelfStorage(1, 1, expirationListener);
+    val overflowStorage = new ShelfStorage(10, 2, expirationListener);
+    overflowShelf = new OverflowShelf(overflowStorage, trash, 20);
+    val overflowBalancer = new OverflowBalancer(overflowShelf, trash);
+    underTest = new TemperatureShelf(0, overflowBalancer, overflowShelf, shelfStorage);
+  }
+
+
   @Test
   public void put() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val order = newOrder(10, 100);
 
     underTest.put(order);
@@ -30,9 +55,6 @@ public class TemperatureShelfTest {
 
   @Test
   public void put_shouldOverflowFreshestOntoOverflowShelf() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val fresh = newOrder(10, 1000);
     val stale = newOrder(11, 100);
     val freshest = newOrder(12, 2000);
@@ -41,16 +63,17 @@ public class TemperatureShelfTest {
     underTest.put(stale);
     underTest.put(freshest);
 
+    assertEquals(stale, overflowShelf.pullStalest(HOT));
     assertEquals(fresh, overflowShelf.pullStalest(HOT));
-    assertEquals(freshest, overflowShelf.pullStalest(HOT));
+    assertNull(overflowShelf.pullStalest(HOT));
+    assertNull(underTest.pull(10));
+    assertNull(underTest.pull(11));
+    assertEquals(freshest, underTest.pull(12));
   }
 
 
   @Test
   public void put_shouldOverflowWithLowerDecayRate() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val lowDecay = newOrder(10, 1, 100); // Lasts 50s on overflow
     val highDecay = newOrder(11, 10, 100); // Lasts 5s on overflow
 
@@ -63,9 +86,6 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val order = newOrder(10, 100);
 
     assertNull(underTest.pull(10));
@@ -77,9 +97,6 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull_pullsFromOverflow() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val order = newOrder(10, 1000);
 
     assertNull(underTest.pull(10));
@@ -90,9 +107,6 @@ public class TemperatureShelfTest {
 
   @Test
   public void pull_pullsFromOverflowWhenSpaceBecomesAvailable() throws Exception {
-    val overflowShelf = newOverflowShelf();
-    val underTest = newTemperatureShelf(overflowShelf);
-
     val order = newOrder(10, 1000);
     val overflow = newOrder(11, 1000);
 
@@ -100,8 +114,25 @@ public class TemperatureShelfTest {
     overflowShelf.put(overflow);
 
     assertEquals(order, underTest.pull(10));
-    assertNull(overflowShelf.pull(HOT, 11));
+    assertNull(overflowShelf.pull(11));
     assertEquals(overflow, underTest.pull(11));
+  }
+
+
+  @Test
+  public void orderShouldBeFoundById() throws Exception {
+    val hot = newOrder(10, HOT);
+    val cold = newOrder(11, COLD);
+    val frozen = newOrder(12, FROZEN);
+
+    underTest.put(hot);
+    underTest.put(cold);
+    underTest.put(frozen);
+
+    assertNull(underTest.pull(1337));
+    assertEquals(hot, underTest.pull(10));
+    assertEquals(cold, underTest.pull(11));
+    assertEquals(frozen, underTest.pull(12));
   }
 
 
@@ -120,6 +151,17 @@ public class TemperatureShelfTest {
         .build();
   }
 
+  private static Order newOrder(long id, Temperature temp) {
+    return new Order.Builder()
+        .id(id)
+        .name("name")
+        .temp(temp)
+        .baseDecayRate(1)
+        .initialShelfLife(100)
+        .decayStrategy(new CumulativeDecayStrategy(TestUtil.clock(2019, 1, 1, 0, 0, 0)))
+        .build();
+  }
+
 
   private static Clock newClock() {
     val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
@@ -128,15 +170,5 @@ public class TemperatureShelfTest {
     val clock = mock(Clock.class);
     when(clock.instant()).thenReturn(one, two);
     return clock;
-  }
-
-
-  private static OverflowShelf newOverflowShelf() {
-    // Capacity is arbitrary, but enough for tests
-    return new OverflowShelf(10, (id, order) -> {}, new Trash(null));
-  }
-
-  private static TemperatureShelf newTemperatureShelf(OverflowShelf overflowShelf) {
-    return new TemperatureShelf(1, overflowShelf, HOT, (id, order) -> {}, new Trash(null));
   }
 }

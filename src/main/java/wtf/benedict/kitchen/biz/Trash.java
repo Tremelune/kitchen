@@ -1,34 +1,20 @@
 package wtf.benedict.kitchen.biz;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 
 /**
- * This is what happens to food that is pished off all the shelves or isn't picked up before it
- * expires.
+ * Food that is pushed off all the shelves or isn't picked up before it expires is sent to the
+ * trash. Happy birthday TO THE GROUND!
  */
 @AllArgsConstructor
 public class Trash {
-  private final List<Order> orders = new ArrayList<>();
-
   private final TrashListener trashListener;
+  private final TrashStorage trashStorage;
 
 
   void add(Order order) {
-    orders.add(order);
+    trashStorage.add(order);
     trashListener.onAdd(order);
-  }
-
-
-  List<Order> getOrders() {
-    return new ArrayList<>(orders);
-  }
-
-
-  void reset() {
-    orders.clear();
   }
 
 

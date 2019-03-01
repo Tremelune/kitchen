@@ -27,11 +27,12 @@ public class DriverDepotTest {
       }
     };
 
-    val underTest = new DriverDepot(Clock.systemUTC());
+    val storage = new DriverStorage();
+    val underTest = new DriverDepot(Clock.systemUTC(), storage);
     underTest.schedulePickup(task, newOrder("ace"));
 
-    assertEquals(1, underTest.getState().keySet().size());
-    assertEquals("ace", underTest.getState().values().iterator().next().getOrder().getName());
+    assertEquals(1, storage.getAll().size());
+    assertEquals("ace", storage.getAll().iterator().next().getOrder().getName());
 
     // Hang out until the task runs, or more than ten seconds pass (max delay time).
     int attempts = 0;
@@ -39,7 +40,7 @@ public class DriverDepotTest {
       Thread.sleep(100);
     }
 
-    assertEquals(0, underTest.getState().keySet().size());
+    assertEquals(0, storage.getAll().size());
   }
 
 

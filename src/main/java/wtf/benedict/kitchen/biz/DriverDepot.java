@@ -3,32 +3,24 @@ package wtf.benedict.kitchen.biz;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 import java.time.Clock;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.val;
+import wtf.benedict.kitchen.biz.DriverStorage.Pickup;
 
 /**
  * Handles the dispatch and cancellation of delivery drivers, while keeping track of their
  * expected time of pickup.
  */
+@AllArgsConstructor
 public class DriverDepot {
-  private final Map<Long, Pickup> orderIdToPickup = new HashMap<>();
-  private final Random random = new Random();
-
   private final Clock clock;
+  private final DriverStorage driverStorage;
 
-
-  public DriverDepot(Clock clock) {
-    this.clock = clock;
-    reset();
-  }
+  private final Random random = new Random();
 
 
   /** "Sends" for a driver to come pickup up this order. */
@@ -38,20 +30,9 @@ public class DriverDepot {
 
   /** Cancels driver. They just...disappear... */
   synchronized void cancelPickup(long orderId) {
-    orderIdToPickup.remove(orderId);
+    driverStorage.delete(orderId);
   }
 
-
-  /** @return State of "active" delivery drivers. */
-  Map<Long, Pickup> getState() {
-    return new HashMap<>(orderIdToPickup); // Hide the internal state from callers.
-  }
-
-
-  /** Clears current driver/pickup state in preparation for a fresh start. */
-  void reset() {
-    orderIdToPickup.clear();
-  }
 
   private void dispatchDriver(TimerTask pickupTask, Order order) {
     // This ensures orders are removed from the map when picked up.
@@ -59,7 +40,7 @@ public class DriverDepot {
       @Override
       public void run() {
         pickupTask.run();
-        orderIdToPickup.remove(order.getId());
+        driverStorage.delete(order.getId());
       }
     };
 
@@ -68,9 +49,8 @@ public class DriverDepot {
     timer.schedule(removalTask, pickupDelay);
 
     val pickupTime = clock.instant().plus(pickupDelay, MILLIS);
-    val delivery = new Pickup(order, pickupTime);
-
-    orderIdToPickup.put(order.getId(), delivery);
+    val pickup = new Pickup(order, pickupTime);
+    driverStorage.add(pickup);
   }
 
 
@@ -80,13 +60,5 @@ public class DriverDepot {
   private int getPickupDelay() {
     val delay = random.nextInt(8) + 2;
     return delay * 1000;
-  }
-
-
-  @AllArgsConstructor
-  @Getter
-  static class Pickup {
-    private Order order;
-    private Instant time;
   }
 }

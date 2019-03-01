@@ -23,12 +23,16 @@ import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.ScheduledPickup;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
+import wtf.benedict.kitchen.biz.StorageResetter;
 
 public class KitchenResourceTest {
   private final Kitchen kitchen = mock(Kitchen.class);
+  private final StorageAggregator storageAggregator = mock(StorageAggregator.class);
+  private final StorageResetter storageResetter = mock(StorageResetter.class);
   private final OrderGenerator orderGenerator = mock(OrderGenerator.class);
 
-  private final KitchenResource underTest = new KitchenResource(kitchen, orderGenerator);
+  private final KitchenResource underTest =
+      new KitchenResource(kitchen, storageAggregator, storageResetter, orderGenerator);
 
 
   @Rule
@@ -48,7 +52,7 @@ public class KitchenResourceTest {
         .pickups(asList(new ScheduledPickup("meatball", 150)))
         .build();
 
-    when(kitchen.getState()).thenReturn(state);
+    when(storageAggregator.getState()).thenReturn(state);
 
     Response response = rule.target("/kitchens")
         .request()

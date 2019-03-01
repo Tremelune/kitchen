@@ -71,6 +71,11 @@ class OrderQueue {
   }
 
 
+  int size() {
+    return orders.size();
+  }
+
+
   private synchronized Order get(boolean isPull, boolean findStalest) {
     if (isEmpty(orders.keySet())) {
       return null;
