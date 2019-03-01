@@ -32,7 +32,7 @@ public class DriverDepotTest {
     };
 
     val storage = new DriverStorage();
-    val underTest = new DriverDepot(Clock.systemUTC(), storage);
+    val underTest = new DriverDepot(Clock.systemUTC(), storage, 2, 10);
     underTest.schedulePickup(task, newOrder("ace"));
 
     assertEquals(1, storage.getAll().size());

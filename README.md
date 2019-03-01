@@ -28,7 +28,7 @@ Later versions of Java and Maven may work, but I used Java 1.8 and Maven 3.5.
 #### Speed
 
 If you want to slow things down to get a better feel for what's going on, you can change the rate
-of pickup in `DriverDepot.getPickupDelay()` and/or the rate of order generation in `OrderGenerator`.
+of pickup in KitchenConfig.
 
 ## Features
 
@@ -96,7 +96,9 @@ points there. I didn't want to try and unpack/tweak/rewrite these classes...
 
 ## User Interface
 
-This is super rudamentary and simply polls the server to get the state of the system and render it into something comprehensible by humans. It utilizes the hottest UI framework trend: Vanilla JS with a smattering of old jQuery...
+This is super rudamentary and simply polls the server to get the state of the system and render it into
+something comprehensible by humans. It utilizes the hottest UI framework trend: Vanilla JS with a smattering
+of old jQuery...
 
 ## License
 

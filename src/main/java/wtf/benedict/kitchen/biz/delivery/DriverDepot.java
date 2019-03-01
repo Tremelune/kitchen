@@ -21,6 +21,8 @@ import wtf.benedict.kitchen.data.Order;
 public class DriverDepot {
   private final Clock clock;
   private final DriverStorage driverStorage;
+  private final int delayMin;
+  private final int delayMax;
 
   private final Random random = new Random();
 
@@ -55,7 +57,7 @@ public class DriverDepot {
   // to see what's really going on, increasing the delay and range here works well. This value is
   // specified in the challenge.
   private int getPickupDelay() {
-    val delay = random.nextInt(8) + 2;
+    val delay = random.nextInt(delayMax - delayMin) + delayMin;
     return delay * 1000;
   }
 }

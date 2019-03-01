@@ -9,4 +9,7 @@ class KitchenConfig extends Configuration {
 
   static final int DECAY_RATE = 1;
   static final int OVERFLOW_DECAY_RATE = 2;
+
+  static final int DRIVER_DELAY_MIN = 2; // Seconds
+  static final int DRIVER_DELAY_MAX = 10; // Seconds
 }
