@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import static wtf.benedict.kitchen.data.Temperature.COLD;
 import static wtf.benedict.kitchen.data.Temperature.FROZEN;

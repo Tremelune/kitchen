@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 
 import io.dropwizard.testing.junit.ResourceTestRule;
 import lombok.val;
-import wtf.benedict.kitchen.biz.Kitchen;
+import wtf.benedict.kitchen.biz.kitchen.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.ScheduledPickup;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;

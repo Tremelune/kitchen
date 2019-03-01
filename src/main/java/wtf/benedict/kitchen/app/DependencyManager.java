@@ -11,18 +11,18 @@ import lombok.val;
 import wtf.benedict.kitchen.api.KitchenResource;
 import wtf.benedict.kitchen.api.OrderGenerator;
 import wtf.benedict.kitchen.api.OrderLoader;
-import wtf.benedict.kitchen.biz.DriverDepot;
-import wtf.benedict.kitchen.biz.DriverExpirationListener;
+import wtf.benedict.kitchen.biz.delivery.DriverDepot;
+import wtf.benedict.kitchen.biz.delivery.DriverExpirationListener;
 import wtf.benedict.kitchen.data.storage.DriverStorage;
-import wtf.benedict.kitchen.biz.DriverTrashListener;
-import wtf.benedict.kitchen.biz.Kitchen;
-import wtf.benedict.kitchen.biz.OverflowBalancer;
-import wtf.benedict.kitchen.biz.OverflowShelf;
+import wtf.benedict.kitchen.biz.delivery.DriverTrashListener;
+import wtf.benedict.kitchen.biz.kitchen.Kitchen;
+import wtf.benedict.kitchen.biz.kitchen.OverflowBalancer;
+import wtf.benedict.kitchen.biz.kitchen.OverflowShelf;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageResetter;
-import wtf.benedict.kitchen.biz.TemperatureShelf;
-import wtf.benedict.kitchen.biz.Trash;
+import wtf.benedict.kitchen.biz.kitchen.TemperatureShelf;
+import wtf.benedict.kitchen.biz.kitchen.Trash;
 import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**

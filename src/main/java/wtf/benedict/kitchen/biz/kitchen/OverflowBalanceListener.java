@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import lombok.AllArgsConstructor;
 import net.jodah.expiringmap.ExpirationListener;

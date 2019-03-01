@@ -1,7 +1,7 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.delivery;
 
 import lombok.AllArgsConstructor;
-import wtf.benedict.kitchen.biz.Trash.TrashListener;
+import wtf.benedict.kitchen.biz.kitchen.Trash.TrashListener;
 import wtf.benedict.kitchen.data.Order;
 
 @AllArgsConstructor

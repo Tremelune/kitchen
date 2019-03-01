@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -18,6 +18,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.biz.kitchen.OverflowBalancer;
+import wtf.benedict.kitchen.biz.kitchen.OverflowShelf;
+import wtf.benedict.kitchen.biz.kitchen.TemperatureShelf;
+import wtf.benedict.kitchen.biz.kitchen.Trash;
 import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.data.Temperature;

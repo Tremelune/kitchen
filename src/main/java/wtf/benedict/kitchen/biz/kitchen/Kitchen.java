@@ -1,10 +1,11 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import java.util.TimerTask;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.biz.delivery.DriverDepot;
+import wtf.benedict.kitchen.biz.kitchen.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.data.Order;
 
 /** Receives and stores orders while coordinating with delivery drivers. */

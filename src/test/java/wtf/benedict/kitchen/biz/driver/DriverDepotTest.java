@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.driver;
 
 import static org.junit.Assert.assertEquals;
 import static wtf.benedict.kitchen.data.Temperature.HOT;
@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.biz.delivery.DriverDepot;
 import wtf.benedict.kitchen.data.storage.DriverStorage;
 import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.test.TestUtil;

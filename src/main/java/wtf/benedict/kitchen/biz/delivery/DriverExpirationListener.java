@@ -1,7 +1,8 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.delivery;
 
 import lombok.AllArgsConstructor;
 import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.biz.kitchen.Trash;
 import wtf.benedict.kitchen.data.Order;
 
 @AllArgsConstructor

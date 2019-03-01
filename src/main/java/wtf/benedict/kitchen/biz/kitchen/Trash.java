@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import lombok.AllArgsConstructor;
 import wtf.benedict.kitchen.data.Order;
@@ -14,13 +14,13 @@ public class Trash {
   private final TrashStorage trashStorage;
 
 
-  void add(Order order) {
+  public void add(Order order) {
     trashStorage.add(order);
     trashListener.onAdd(order);
   }
 
 
-  interface TrashListener {
+  public interface TrashListener {
     void onAdd(Order order);
   }
 }

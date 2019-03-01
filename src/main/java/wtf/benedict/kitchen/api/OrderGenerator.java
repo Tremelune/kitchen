@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.Kitchen;
+import wtf.benedict.kitchen.biz.kitchen.Kitchen;
 import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.biz.OrderMessage;
 import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;

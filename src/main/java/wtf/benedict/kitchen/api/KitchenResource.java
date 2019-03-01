@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
-import wtf.benedict.kitchen.biz.Kitchen;
+import wtf.benedict.kitchen.biz.kitchen.Kitchen;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 import wtf.benedict.kitchen.biz.StorageResetter;

@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.delivery;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
@@ -26,7 +26,7 @@ public class DriverDepot {
 
 
   /** "Sends" for a driver to come pickup up this order. */
-  void schedulePickup(TimerTask pickupTask, Order order) {
+  public void schedulePickup(TimerTask pickupTask, Order order) {
     dispatchDriver(pickupTask, order);
   }
 

@@ -1,8 +1,8 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.biz.kitchen.OverflowShelf.StaleOrderException;
 import wtf.benedict.kitchen.data.storage.CapacityExceededException;
 import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
