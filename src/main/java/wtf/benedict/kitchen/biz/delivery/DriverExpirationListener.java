@@ -2,18 +2,15 @@ package wtf.benedict.kitchen.biz.delivery;
 
 import lombok.AllArgsConstructor;
 import net.jodah.expiringmap.ExpirationListener;
-import wtf.benedict.kitchen.biz.kitchen.Trash;
 import wtf.benedict.kitchen.data.Order;
 
 @AllArgsConstructor
 public class DriverExpirationListener implements ExpirationListener<Long, Order> {
-  private final DriverDepot driverDepot;
-  private final Trash trash;
+  private final OrderExpirer orderExpirer;
 
 
   @Override
   public void expired(Long id, Order order) {
-    driverDepot.cancelPickup(order.getId());
-    trash.add(order);
+    orderExpirer.expireOrder(order);
   }
 }

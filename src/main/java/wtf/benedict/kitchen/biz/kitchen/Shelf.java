@@ -1,19 +1,42 @@
 package wtf.benedict.kitchen.biz.kitchen;
 
-import lombok.AllArgsConstructor;
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.biz.delivery.OrderExpirer;
 import wtf.benedict.kitchen.biz.kitchen.OverflowShelf.StaleOrderException;
-import wtf.benedict.kitchen.data.storage.CapacityExceededException;
 import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.Temperature;
+import wtf.benedict.kitchen.data.storage.CapacityExceededException;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
 
 /** Stores orders of a particular temperature. */
-@AllArgsConstructor
 public class Shelf {
   private final double overflowDecayRate;
-  private final OverflowBalancer overflowBalancer;
   private final OverflowShelf overflowShelf;
   private final ShelfStorage shelfStorage;
+  private final Trash trash;
+
+
+  public Shelf(
+      double overflowDecayRate,
+      OrderExpirer orderExpirer,
+      OverflowShelf overflowShelf,
+      ShelfStorageFactory shelfStorageFactory,
+      Trash trash) {
+
+    this.overflowDecayRate = overflowDecayRate;
+    this.overflowShelf = overflowShelf;
+    this.trash = trash;
+
+    val listener = newBalanceListener(orderExpirer);
+    this.shelfStorage = shelfStorageFactory.create(listener);
+  }
+
+
+  /** See ShelfStorageFactory. */
+  public ShelfStorage getShelfStorage() {
+    return shelfStorage;
+  }
 
 
   /**
@@ -43,9 +66,33 @@ public class Shelf {
       return overflowShelf.pull(orderId);
     }
 
-    overflowBalancer.balance(this, order.getTemp());
+    balanceFromOverflow(order.getTemp());
 
     return order;
+  }
+
+
+  private ExpirationListener<Long, Order> newBalanceListener(OrderExpirer expirer) {
+    return (orderId, order) -> {
+      expirer.expireOrder(order);
+      balanceFromOverflow(order.getTemp());
+    };
+  }
+
+
+  /** Pulls orders from overflow and adds them to the temperature shelf, if possible. */
+  private void balanceFromOverflow(Temperature temp) {
+    val overflowOrder = overflowShelf.pullStalest(temp);
+    if (overflowOrder != null) {
+      try {
+        put(overflowOrder);
+      } catch (StaleOrderException e) {
+        // If this happens, it means another order was added to overflow between the pull and put
+        // above, and the order we just pulled from overflow is now the stalest...which means it
+        // should be discarded.
+        trash.add(overflowOrder);
+      }
+    }
   }
 
 

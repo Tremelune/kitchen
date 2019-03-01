@@ -19,7 +19,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.biz.delivery.OrderExpirer;
 import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
 import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.data.Temperature;
 import wtf.benedict.kitchen.test.TestUtil;
@@ -28,6 +30,8 @@ import wtf.benedict.kitchen.test.TestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShelfTest {
+  @Mock
+  private DriverStorage driverStorage;
   @Mock
   private ExpirationListener<Long, Order> expirationListener;
   @Mock
@@ -39,11 +43,11 @@ public class ShelfTest {
 
   @Before
   public void setUp() {
-    val shelfStorage = new ShelfStorage(1, 1, expirationListener);
+    val shelfStorageFactory = new ShelfStorageFactory(1, 1);
+    val orderExpirer = new OrderExpirer(driverStorage, trash);
     val overflowStorage = new ShelfStorage(10, 2, expirationListener);
     overflowShelf = new OverflowShelf(overflowStorage, trash, 20);
-    val overflowBalancer = new OverflowBalancer(overflowShelf, trash);
-    underTest = new Shelf(0, overflowBalancer, overflowShelf, shelfStorage);
+    underTest = new Shelf(0, orderExpirer, overflowShelf, shelfStorageFactory, trash);
   }
 
 

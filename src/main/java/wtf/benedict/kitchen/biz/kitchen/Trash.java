@@ -2,6 +2,7 @@ package wtf.benedict.kitchen.biz.kitchen;
 
 import lombok.AllArgsConstructor;
 import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
 import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**
@@ -10,17 +11,12 @@ import wtf.benedict.kitchen.data.storage.TrashStorage;
  */
 @AllArgsConstructor
 public class Trash {
-  private final TrashListener trashListener;
+  private final DriverStorage driverStorage;
   private final TrashStorage trashStorage;
 
 
   public void add(Order order) {
     trashStorage.add(order);
-    trashListener.onAdd(order);
-  }
-
-
-  public interface TrashListener {
-    void onAdd(Order order);
+    driverStorage.delete(order.getId());
   }
 }

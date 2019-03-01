@@ -30,11 +30,6 @@ public class DriverDepot {
     dispatchDriver(pickupTask, order);
   }
 
-  /** Cancels driver. They just...disappear... */
-  synchronized void cancelPickup(long orderId) {
-    driverStorage.delete(orderId);
-  }
-
 
   private void dispatchDriver(TimerTask pickupTask, Order order) {
     // This ensures orders are removed from the map when picked up.
