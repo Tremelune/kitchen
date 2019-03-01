@@ -2,16 +2,14 @@ package wtf.benedict.kitchen.api;
 
 import java.time.Clock;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.biz.OrderMessage;
 import wtf.benedict.kitchen.biz.kitchen.Kitchen;
 import wtf.benedict.kitchen.data.Order;
-import wtf.benedict.kitchen.biz.OrderMessage;
-import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
 import wtf.benedict.kitchen.data.Temperature;
 
 /**
@@ -34,7 +32,10 @@ public class OrderGenerator {
   /** Pulls orders and places them according to our order placement strategy. */
   void generateOrders(Kitchen kitchen) {
     while (orderLoader.hasNext()) {
-      scheduleOrderArrival(kitchen, orderLoader.next());
+      val message = orderLoader.next();
+      val order = asOrder(message);
+      kitchen.receiveOrder(order);
+      sleep();
     }
   }
 
@@ -42,25 +43,6 @@ public class OrderGenerator {
   /** Clears already-loaded orders so they can be loaded fresh. */
   void reset() {
     orderLoader.reset();
-  }
-
-
-  private void scheduleOrderArrival(Kitchen kitchen, OrderMessage message) {
-    val order = asOrder(message);
-    val task = newOrderTask(kitchen, order);
-    val timer = new Timer("Generate order");
-    int delay = poissonDelay() * 1000; // Convert to seconds
-    timer.schedule(task, delay);
-  }
-
-
-  private TimerTask newOrderTask(Kitchen kitchen, Order order) {
-    return new TimerTask() {
-      @Override
-      public void run() {
-        kitchen.receiveOrder(order);
-      }
-    };
   }
 
 
@@ -84,17 +66,17 @@ public class OrderGenerator {
   }
 
 
-  // https://stackoverflow.com/questions/9832919/generate-poisson-arrival-in-java
-  private int poissonDelay() {
-    int r = 0;
-    double a = random.nextDouble();
-    double p = Math.exp(-ARRIVAL_AVERAGE);
-
-    while (a > p) {
-      r++;
-      a = a - p;
-      p = p * ARRIVAL_AVERAGE / r;
+  private static void sleep() {
+    try {
+      Thread.sleep(poissonDelay());
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e.getMessage(), e);
     }
-    return r;
+  }
+
+  // https://stackoverflow.com/questions/2206199/how-do-i-generate-discrete-random-events-with-a-poisson-distribution/5615564#5615564
+  private static long poissonDelay() {
+    double delay = Math.log(1.0-Math.random())/-ARRIVAL_AVERAGE;
+    return Math.round(delay * 1000); // Convert to seconds, round to long.
   }
 }
