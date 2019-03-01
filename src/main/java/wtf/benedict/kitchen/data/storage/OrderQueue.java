@@ -47,9 +47,7 @@ class OrderQueue {
     order.changeDecayRate(decayRateMultiplier);
     val remainingShelfLife = order.calculateRemainingShelfLife();
 
-    synchronized (orders) {
-      orders.put(order.getId(), order, remainingShelfLife, SECONDS);
-    }
+    orders.put(order.getId(), order, remainingShelfLife, SECONDS);
   }
 
 
@@ -71,18 +69,14 @@ class OrderQueue {
 
   /** Pulls order by ID, removing it from the queue. */
   Order pull(long orderId) {
-    synchronized (orders) {
-      val order = orders.get(orderId);
-      orders.remove(orderId);
-      return order;
-    }
+    val order = orders.get(orderId);
+    orders.remove(orderId);
+    return order;
   }
 
 
   List<Order> getAll() {
-    synchronized (orders) {
-      return new ArrayList<>(orders.values());
-    }
+    return new ArrayList<>(orders.values());
   }
 
 
@@ -92,9 +86,7 @@ class OrderQueue {
 
 
   void deleteAll() {
-    synchronized (orders) {
-      orders.clear();
-    }
+    orders.clear();
   }
 
 
@@ -103,13 +95,11 @@ class OrderQueue {
       return null;
     }
 
-    synchronized (orders) {
-      val order = getMost(findStalest);
-      if (isPull) {
-        orders.remove(order.getId());
-      }
-      return order;
+    val order = getMost(findStalest);
+    if (isPull) {
+      orders.remove(order.getId());
     }
+    return order;
   }
 
 
