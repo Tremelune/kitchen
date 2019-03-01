@@ -46,7 +46,7 @@ class OrderQueue {
 
     order.changeDecayRate(decayRateMultiplier);
 
-    synchronized (orders) {
+    synchronized (this) {
       orders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
     }
   }
@@ -96,7 +96,7 @@ class OrderQueue {
       return null;
     }
 
-    synchronized (orders) {
+    synchronized (this) {
       val order = getMost(findStalest);
       if (isPull) {
         orders.remove(order.getId());
@@ -108,9 +108,8 @@ class OrderQueue {
 
   // Get stalest or freshest.
   private Order getMost(boolean stale) {
-    val comparator = stale
-        ? RemainingShelfLifeComparator.INSTANCE
-        : RemainingShelfLifeComparator.INSTANCE.reversed();
+    val lifeComparator = RemainingShelfLifeComparator.INSTANCE;
+    val comparator = stale ? lifeComparator : lifeComparator.reversed();
 
     val orders = new ArrayList<Order>(this.orders.values());
     orders.sort(comparator);
