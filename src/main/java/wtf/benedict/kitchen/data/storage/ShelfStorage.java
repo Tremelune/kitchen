@@ -1,8 +1,8 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data.storage;
 
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.FROZEN;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,8 @@ import java.util.Map;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
-import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.Temperature;
 
 /** State for the storage shelves. */
 public class ShelfStorage {
@@ -85,7 +86,7 @@ public class ShelfStorage {
   }
 
 
-  public void put(Order order) throws OverflowException {
+  public void put(Order order) throws CapacityExceededException {
     queues.get(order.getTemp()).put(order);
   }
 

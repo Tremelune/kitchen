@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Clock;
 
@@ -17,6 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
+import wtf.benedict.kitchen.data.Temperature;
 import wtf.benedict.kitchen.test.TestUtil;
 
 @RunWith(MockitoJUnitRunner.class)

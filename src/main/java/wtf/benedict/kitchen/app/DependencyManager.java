@@ -13,17 +13,17 @@ import wtf.benedict.kitchen.api.OrderGenerator;
 import wtf.benedict.kitchen.api.OrderLoader;
 import wtf.benedict.kitchen.biz.DriverDepot;
 import wtf.benedict.kitchen.biz.DriverExpirationListener;
-import wtf.benedict.kitchen.biz.DriverStorage;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
 import wtf.benedict.kitchen.biz.DriverTrashListener;
 import wtf.benedict.kitchen.biz.Kitchen;
 import wtf.benedict.kitchen.biz.OverflowBalancer;
 import wtf.benedict.kitchen.biz.OverflowShelf;
-import wtf.benedict.kitchen.biz.ShelfStorage;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageResetter;
 import wtf.benedict.kitchen.biz.TemperatureShelf;
 import wtf.benedict.kitchen.biz.Trash;
-import wtf.benedict.kitchen.biz.TrashStorage;
+import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**
  * Builds the dependency graph for the system.

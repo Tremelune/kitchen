@@ -2,6 +2,7 @@ package wtf.benedict.kitchen.biz;
 
 import lombok.AllArgsConstructor;
 import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.data.Order;
 
 /** This ensures we grab from overflow when space frees up due to passive expiration. */
 // TODO Wait. How do I use this without cyclical dependencies?

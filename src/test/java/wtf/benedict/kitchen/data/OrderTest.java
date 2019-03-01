@@ -1,15 +1,16 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Clock;
 
 import org.junit.Test;
 
 import lombok.val;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
 import wtf.benedict.kitchen.test.TestUtil;
 
 public class OrderTest {

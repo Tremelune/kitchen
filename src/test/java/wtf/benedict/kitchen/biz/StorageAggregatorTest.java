@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.FROZEN;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 import static wtf.benedict.kitchen.test.TestUtil.asList;
 import static wtf.benedict.kitchen.test.TestUtil.assertSize;
 
@@ -20,7 +20,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
-import wtf.benedict.kitchen.biz.DriverStorage.Pickup;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
+import wtf.benedict.kitchen.data.storage.DriverStorage.Pickup;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
+import wtf.benedict.kitchen.data.Temperature;
+import wtf.benedict.kitchen.data.storage.TrashStorage;
 import wtf.benedict.kitchen.test.TestUtil;
 
 @RunWith(MockitoJUnitRunner.class)

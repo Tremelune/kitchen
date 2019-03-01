@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data.storage;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
 import net.jodah.expiringmap.ExpiringMap;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
 
 /** Push/pull queue that passively expires orders when their remaining shelf life drops to zero. */
 class OrderQueue {
@@ -35,11 +37,11 @@ class OrderQueue {
   /**
    * Places an order in the queue, change its current decay rate.
    *
-   * @throws OverflowException if the queue is at capacity.
+   * @throws CapacityExceededException if the queue is at capacity.
    */
-  synchronized void put(Order order) throws OverflowException {
+  synchronized void put(Order order) throws CapacityExceededException {
     if (orders.size() >= capacity) {
-      throw new OverflowException(capacity);
+      throw new CapacityExceededException(capacity);
     }
 
     order.changeDecayRate(decayRateMultiplier);
@@ -99,13 +101,5 @@ class OrderQueue {
     orders.sort(comparator);
 
     return orders.iterator().next();
-  }
-
-
-  // It's worth defining our own checked exception so we can handle this explicit case.
-  static class OverflowException extends Exception {
-    private OverflowException(int capacity) {
-      super("At the maximum capacity of: " + capacity);
-    }
   }
 }

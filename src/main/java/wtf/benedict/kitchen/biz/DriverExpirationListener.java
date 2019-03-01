@@ -2,6 +2,7 @@ package wtf.benedict.kitchen.biz;
 
 import lombok.AllArgsConstructor;
 import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.data.Order;
 
 @AllArgsConstructor
 public class DriverExpirationListener implements ExpirationListener<Long, Order> {

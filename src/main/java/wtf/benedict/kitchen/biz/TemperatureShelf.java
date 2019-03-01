@@ -2,8 +2,10 @@ package wtf.benedict.kitchen.biz;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.data.storage.CapacityExceededException;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
 
 /** Stores orders of a particular temperature. */
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public class TemperatureShelf {
   void put(Order order) throws StaleOrderException {
     try {
       shelfStorage.put(order);
-    } catch (OverflowException e) {
+    } catch (CapacityExceededException e) {
       handleOverflow(order);
     }
   }

@@ -3,6 +3,7 @@ package wtf.benedict.kitchen.biz;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.data.Temperature;
 
 /** Ensures that the overflow shelf is eagerly pulled from when space frees up. */
 @AllArgsConstructor

@@ -1,9 +1,9 @@
 package wtf.benedict.kitchen.biz;
 
 import static java.util.stream.Collectors.toList;
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.FROZEN;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -15,7 +15,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
-import wtf.benedict.kitchen.biz.DriverStorage.Pickup;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
+import wtf.benedict.kitchen.data.storage.DriverStorage.Pickup;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
+import wtf.benedict.kitchen.data.Temperature;
+import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**
  * Aggregates the state of the system and bundles it up for serialization into a response.

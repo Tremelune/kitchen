@@ -1,7 +1,9 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data.storage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import wtf.benedict.kitchen.data.Order;
 
 /** Stores the state of the trash. */
 public class TrashStorage {

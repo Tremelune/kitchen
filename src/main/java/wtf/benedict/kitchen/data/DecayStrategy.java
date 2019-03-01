@@ -1,7 +1,7 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data;
 
-/** Provides a mechanism for easily swapping decay stategies in and out on a per-order basis. */
-interface DecayStrategy {
+/** Provides a mechanism for easily swapping decay strategies in and out on a per-order basis. */
+public interface DecayStrategy {
   /** Sets a new decay rate moving forward. */
   void changeDecayRate(double rate);
 

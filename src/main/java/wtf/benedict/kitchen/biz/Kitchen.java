@@ -5,6 +5,7 @@ import java.util.TimerTask;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import wtf.benedict.kitchen.biz.OverflowShelf.StaleOrderException;
+import wtf.benedict.kitchen.data.Order;
 
 /** Receives and stores orders while coordinating with delivery drivers. */
   @AllArgsConstructor

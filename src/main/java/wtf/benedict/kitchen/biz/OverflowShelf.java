@@ -1,15 +1,19 @@
 package wtf.benedict.kitchen.biz;
 
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.FROZEN;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
-import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
+import wtf.benedict.kitchen.data.storage.CapacityExceededException;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
+import wtf.benedict.kitchen.data.Temperature;
 
 /**
  * Holds orders that the temperature shelves don't have space for.
@@ -46,7 +50,7 @@ public class OverflowShelf {
         // Add this new freshness.
         shelfStorage.put(order);
       }
-    } catch (OverflowException e) {
+    } catch (CapacityExceededException e) {
       throw new IllegalStateException("Overflow shelf is full for: " + order);
     }
   }

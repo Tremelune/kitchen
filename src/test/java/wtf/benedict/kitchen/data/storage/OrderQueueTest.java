@@ -1,21 +1,22 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data.storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Clock;
 
 import org.junit.Test;
 
 import lombok.val;
-import wtf.benedict.kitchen.biz.OrderQueue.OverflowException;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.test.TestUtil;
 
 public class OrderQueueTest {
-  @Test(expected = OverflowException.class)
+  @Test(expected = CapacityExceededException.class)
   public void add_capacityCheck() throws Exception {
     val a = newOrder(10, 200);
     val b = newOrder(11, 100);
@@ -79,8 +80,8 @@ public class OrderQueueTest {
 
   @Test
   public void expiration() throws Exception {
-    val fresh = newOrder(10, 3);
-    val stale = newOrder(11, 2);
+    val fresh = newOrder(10, 2);
+    val stale = newOrder(11, 1);
 
     val underTest = new OrderQueue(2, 1, (id, order) -> {});
     underTest.put(stale);

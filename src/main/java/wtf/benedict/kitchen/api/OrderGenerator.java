@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import wtf.benedict.kitchen.biz.Kitchen;
-import wtf.benedict.kitchen.biz.Order;
+import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.biz.OrderMessage;
 import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
-import wtf.benedict.kitchen.biz.Temperature;
+import wtf.benedict.kitchen.data.Temperature;
 
 /**
  * Places orders to the kitchen to be made and stored for pickup.

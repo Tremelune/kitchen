@@ -1,6 +1,8 @@
 package wtf.benedict.kitchen.biz;
 
 import lombok.AllArgsConstructor;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**
  * Food that is pushed off all the shelves or isn't picked up before it expires is sent to the

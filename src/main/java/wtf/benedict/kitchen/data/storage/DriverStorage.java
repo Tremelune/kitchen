@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data.storage;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import wtf.benedict.kitchen.data.Order;
 
 /** Current state of delivery drivers and their time-to-pickup. */
 public class DriverStorage {
