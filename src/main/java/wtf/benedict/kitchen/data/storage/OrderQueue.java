@@ -4,6 +4,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lombok.val;
 import net.jodah.expiringmap.ExpirationListener;
@@ -13,8 +14,7 @@ import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
 
 /** Push/pull queue that passively expires orders when their remaining shelf life drops to zero. */
 class OrderQueue {
-  final ExpiringMap<Long, Order> orders;
-
+  private final ExpiringMap<Long, Order> orders;
   private final int capacity;
   private final double decayRateMultiplier;
 
@@ -39,13 +39,16 @@ class OrderQueue {
    *
    * @throws CapacityExceededException if the queue is at capacity.
    */
-  synchronized void put(Order order) throws CapacityExceededException {
+  void put(Order order) throws CapacityExceededException {
     if (orders.size() >= capacity) {
       throw new CapacityExceededException(capacity);
     }
 
     order.changeDecayRate(decayRateMultiplier);
-    orders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
+
+    synchronized (orders) {
+      orders.put(order.getId(), order, order.calculateRemainingShelfLife(), SECONDS);
+    }
   }
 
 
@@ -73,21 +76,33 @@ class OrderQueue {
   }
 
 
+  synchronized List<Order> getAll() {
+    return new ArrayList<>(orders.values());
+  }
+
+
   int size() {
     return orders.size();
   }
 
 
-  private synchronized Order get(boolean isPull, boolean findStalest) {
+  synchronized void deleteAll() {
+    orders.clear();
+  }
+
+
+  private Order get(boolean isPull, boolean findStalest) {
     if (isEmpty(orders.keySet())) {
       return null;
     }
 
-    val order = getMost(findStalest);
-    if (isPull) {
-      orders.remove(order.getId());
+    synchronized (orders) {
+      val order = getMost(findStalest);
+      if (isPull) {
+        orders.remove(order.getId());
+      }
+      return order;
     }
-    return order;
   }
 
 

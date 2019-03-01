@@ -29,7 +29,7 @@ public class ShelfStorage {
 
 
   /** Pulls the order with the lowest remaining shelf life by temperature. */
-  public synchronized Order pullStalest(Temperature temp) {
+  public Order pullStalest(Temperature temp) {
     return queues.get(temp).pullStalest();
   }
 
@@ -63,7 +63,7 @@ public class ShelfStorage {
     val orders = new ArrayList<Order>();
 
     for (OrderQueue queue : queues.values()) {
-      orders.addAll(queue.orders.values());
+      orders.addAll(queue.getAll());
     }
 
     return orders;
@@ -72,7 +72,7 @@ public class ShelfStorage {
 
   /** Gets all orders for a particular temperature shelf. */
   public List<Order> getAll(Temperature temp) {
-    return new ArrayList<>(queues.get(temp).orders.values());
+    return new ArrayList<>(queues.get(temp).getAll());
   }
 
 
@@ -93,7 +93,7 @@ public class ShelfStorage {
 
   public void deleteAll() {
     for (val queue : queues.values()) {
-      queue.orders.clear();
+      queue.deleteAll();
     }
   }
 }

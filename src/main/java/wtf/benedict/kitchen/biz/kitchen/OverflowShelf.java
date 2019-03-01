@@ -33,7 +33,7 @@ public class OverflowShelf {
    * 1) The stalest order is trashed and the incoming order is added.
    * 2) The incoming order is the stalest, and it is rejected.
    */
-  synchronized void put(Order order) throws StaleOrderException {
+  void put(Order order) throws StaleOrderException {
     try {
       if (shelfStorage.countAll() < capacity) {
         shelfStorage.put(order);
@@ -57,13 +57,13 @@ public class OverflowShelf {
 
 
   /** Pulls the order with the lowest remaining shelf life by temperature. */
-  synchronized Order pullStalest(Temperature temp) {
+  Order pullStalest(Temperature temp) {
     return shelfStorage.pullStalest(temp);
   }
 
 
   /** Pulls the order by ID. */
-  synchronized Order pull(long orderId) {
+  Order pull(long orderId) {
     return shelfStorage.pull(orderId);
   }
 

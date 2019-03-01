@@ -59,7 +59,7 @@ public class Shelf {
    * Pulls order by ID, removing it from the shelf. If there are orders of the matching temperature
    * on the overflow shelf, they are pulled in.
    */
-  synchronized Order pull(long orderId) {
+  Order pull(long orderId) {
     Order order = shelfStorage.pull(orderId);
     if (order == null) {
       // No order here...but check overflow for it, but don't try and pull more from there...
@@ -97,7 +97,7 @@ public class Shelf {
 
 
   // This finds the freshest order (including the new one passed in) and sends it to overflow.
-  synchronized private void handleOverflow(Order order)
+  private void handleOverflow(Order order)
       throws StaleOrderException {
 
     val currentFreshest = shelfStorage.getFreshest(order.getTemp());
