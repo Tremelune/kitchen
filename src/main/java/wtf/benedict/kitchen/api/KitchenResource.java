@@ -11,8 +11,10 @@ import javax.ws.rs.core.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
-import wtf.benedict.kitchen.biz.Kitchen;
+import wtf.benedict.kitchen.biz.kitchen.Kitchen;
+import wtf.benedict.kitchen.biz.StorageAggregator;
 import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
+import wtf.benedict.kitchen.biz.StorageResetter;
 
 /**
  * One API class to rule them all.
@@ -26,13 +28,15 @@ import wtf.benedict.kitchen.biz.StorageAggregator.StorageState;
 @AllArgsConstructor
 public class KitchenResource {
   private final Kitchen kitchen;
+  private final StorageAggregator storageAggregator;
+  private final StorageResetter storageResetter;
   private final OrderGenerator orderGenerator;
 
 
   /** Gets the current state of the system at this moment in time, suitable for display. */
   @GET
   public StorageState getShelves() {
-    return kitchen.getState();
+    return storageAggregator.getState();
   }
 
 
@@ -40,7 +44,7 @@ public class KitchenResource {
   @POST
   @Path("/starts")
   public Response start() {
-    kitchen.reset();
+    storageResetter.reset();
     orderGenerator.reset();
     orderGenerator.generateOrders(kitchen);
     return Response.status(200).build();

@@ -1,4 +1,4 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -33,31 +33,31 @@ public class Order {
 
 
   /** Sets a new decay rate moving forward. */
-  void changeDecayRate(double rate) {
+  public void changeDecayRate(double rate) {
     decayStrategy.changeDecayRate(rate);
   }
 
 
   /** Calculates remaining shelf life at the current decay rate (in seconds). */
-  long calculateRemainingShelfLife() {
+  public long calculateRemainingShelfLife() {
     return decayStrategy.calculateRemainingShelfLife(baseDecayRate, initialShelfLife);
   }
 
   /** Calculates remaining shelf life for newRate (in seconds). */
-  long calculateRemainingShelfLifeAt(double decayRate) {
+  public long calculateRemainingShelfLifeAt(double decayRate) {
     return decayStrategy.calculateRemainingShelfLifeAt(baseDecayRate, initialShelfLife, decayRate);
   }
 
 
-  long getId() {
+  public long getId() {
     return id;
   }
 
-  String getName() {
+  public String getName() {
     return name;
   }
 
-  Temperature getTemp() {
+  public Temperature getTemp() {
     return temp;
   }
 

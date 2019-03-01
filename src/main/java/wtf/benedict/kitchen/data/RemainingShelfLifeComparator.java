@@ -1,10 +1,10 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.data;
 
 import java.util.Comparator;
 
 /** Sort by remaining shelf life. */
-class RemainingShelfLifeComparator {
-  static final Comparator<Order> INSTANCE = newRemainingShelfLifeComparator();
+public class RemainingShelfLifeComparator {
+  public static final Comparator<Order> INSTANCE = newRemainingShelfLifeComparator();
 
 
   // Note: If this is used in a SortedSet, it will treat elements with the same remaining shelf life

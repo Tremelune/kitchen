@@ -1,23 +1,27 @@
 package wtf.benedict.kitchen.biz;
 
 import static java.util.stream.Collectors.toList;
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.FROZEN;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.FROZEN;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
-import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
+import wtf.benedict.kitchen.data.storage.DriverStorage.Pickup;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
+import wtf.benedict.kitchen.data.Temperature;
+import wtf.benedict.kitchen.data.storage.TrashStorage;
 
 /**
  * Aggregates the state of the system and bundles it up for serialization into a response.
@@ -25,26 +29,30 @@ import wtf.benedict.kitchen.biz.DriverDepot.Pickup;
  * I could see separating the aggregation from the conversion to an API response, but so far this
  * seems straightforward enough not to worry about it yet.
  */
+@AllArgsConstructor
 public class StorageAggregator {
-  StorageState getState(
-      Storage storage, Map<Long, Pickup> orderIdToDelivery, Trash trash) {
+  private final DriverStorage driverStorage;
+  private final ShelfStorage overflowStorage;
+  private final ShelfStorage shelfStorage;
+  private final TrashStorage trashStorage;
 
-    val hotEntries = toEntries(storage, HOT);
-    val coldEntries = toEntries(storage, COLD);
-    val frozenEntries = toEntries(storage, FROZEN);
 
-    val overflowEntries = new ArrayList<Entry>();
-    for (OrderQueue queue : storage.overflowShelf.queues.values()) {
-      val entries = toEntries(queue.orders.values());
-      overflowEntries.addAll(entries);
-    }
+  /**
+   * @return State of the whole system, including waiting orders, shelves, trash, and delivery
+   * drivers.
+   */
+  public StorageState getState() {
+    val hotEntries = toEntries(shelfStorage.getAll(HOT));
+    val coldEntries = toEntries(shelfStorage.getAll(COLD));
+    val frozenEntries = toEntries(shelfStorage.getAll(FROZEN));
+    val overflowEntries = toEntries(overflowStorage.getAll());
 
-    val pickups = orderIdToDelivery.values().stream()
+    val pickups = driverStorage.getAll().stream()
         .map(StorageAggregator::toScheduledPickup)
         .sorted(newPickupComparator())
         .collect(toList());
 
-    val trashedEntries = trash.getOrders().stream()
+    val trashedEntries = trashStorage.getAll().stream()
         .map(StorageAggregator::toEntry)
         .collect(toList());
 
@@ -56,11 +64,6 @@ public class StorageAggregator {
         .pickups(pickups)
         .trashedEntries(trashedEntries)
         .build();
-  }
-
-
-  private static List<Entry> toEntries(Storage storage, Temperature temp) {
-    return toEntries(storage.tempToShelf.get(temp).queue.orders.values());
   }
 
 

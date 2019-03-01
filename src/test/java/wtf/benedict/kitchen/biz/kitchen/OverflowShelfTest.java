@@ -1,52 +1,65 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.kitchen;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static wtf.benedict.kitchen.biz.Temperature.COLD;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.COLD;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Clock;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.data.Order;
+import wtf.benedict.kitchen.data.Temperature;
+import wtf.benedict.kitchen.data.storage.ShelfStorage;
 import wtf.benedict.kitchen.test.TestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OverflowShelfTest {
   @Mock
+  private ExpirationListener<Long, Order> expirationListener;
+  @Mock
   private Trash trash;
+
+  private OverflowShelf underTest;
+
+
+  @Before
+  public void setUp() {
+    val shelfStorage = new ShelfStorage(10, 1, expirationListener);
+    underTest = new OverflowShelf(shelfStorage, trash, 10);
+  }
 
 
   @Test
   public void pull_byOrderId() throws Exception {
-    val underTest = new OverflowShelf(2, (id, order) -> {}, trash);
-
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);
 
     underTest.put(fresh);
     underTest.put(stale);
-    assertEquals(fresh, underTest.pull(HOT, 10));
+    assertEquals(fresh, underTest.pull(10));
   }
 
 
   @Test
   public void pushAndPullShouldTrackSize() throws Exception {
-    val underTest = new OverflowShelf(1, (id, order) -> {}, trash);
-
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);
 
     // Push and pull a few to make sure the size is tracked accurately.
     underTest.put(fresh);
     assertEquals(fresh, underTest.pullStalest(HOT));
-    assertNull(underTest.pull(HOT, 10));
+    assertNull(underTest.pull(10));
     underTest.put(stale);
     assertEquals(stale, underTest.pullStalest(COLD));
     underTest.put(fresh);
@@ -58,7 +71,9 @@ public class OverflowShelfTest {
 
   @Test
   public void overflowShouldDiscardStalest() throws Exception {
-    val underTest = new OverflowShelf(1, (id, order) -> {}, trash);
+    // Easiest way to reduce capacity to 1
+    val shelfStorage = new ShelfStorage(1, 1, expirationListener);
+    val underTest = new OverflowShelf(shelfStorage, trash, 1);
 
     val fresh = newOrder(10, HOT, 200);
     val stale = newOrder(11, COLD, 100);

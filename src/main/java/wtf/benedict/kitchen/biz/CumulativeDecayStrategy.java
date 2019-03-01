@@ -10,6 +10,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
+import wtf.benedict.kitchen.data.DecayStrategy;
 
 /**
  * This is ostensibly the normalization equation

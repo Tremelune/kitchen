@@ -1,7 +1,7 @@
-package wtf.benedict.kitchen.biz;
+package wtf.benedict.kitchen.biz.driver;
 
 import static org.junit.Assert.assertEquals;
-import static wtf.benedict.kitchen.biz.Temperature.HOT;
+import static wtf.benedict.kitchen.data.Temperature.HOT;
 
 import java.time.Clock;
 import java.util.TimerTask;
@@ -12,6 +12,10 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import lombok.val;
+import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
+import wtf.benedict.kitchen.biz.delivery.DriverDepot;
+import wtf.benedict.kitchen.data.storage.DriverStorage;
+import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.test.TestUtil;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,11 +31,12 @@ public class DriverDepotTest {
       }
     };
 
-    val underTest = new DriverDepot(Clock.systemUTC());
+    val storage = new DriverStorage();
+    val underTest = new DriverDepot(Clock.systemUTC(), storage);
     underTest.schedulePickup(task, newOrder("ace"));
 
-    assertEquals(1, underTest.getState().keySet().size());
-    assertEquals("ace", underTest.getState().values().iterator().next().getOrder().getName());
+    assertEquals(1, storage.getAll().size());
+    assertEquals("ace", storage.getAll().iterator().next().getOrder().getName());
 
     // Hang out until the task runs, or more than ten seconds pass (max delay time).
     int attempts = 0;
@@ -39,7 +44,7 @@ public class DriverDepotTest {
       Thread.sleep(100);
     }
 
-    assertEquals(0, underTest.getState().keySet().size());
+    assertEquals(0, storage.getAll().size());
   }
 
 
