@@ -28,7 +28,7 @@ class OrderQueue {
     this.decayRateMultiplier = decayRateMultiplier;
 
     orders = ExpiringMap.builder()
-        .variableExpiration()
+        .variableExpiration() // Handled in put().
         .expirationListener(expirationListener)
         .build();
   }
