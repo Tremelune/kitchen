@@ -14,7 +14,7 @@ import wtf.benedict.kitchen.data.RemainingShelfLifeComparator;
 
 /** Push/pull queue that passively expires orders when their remaining shelf life drops to zero. */
 class OrderQueue {
-  private final ExpiringMap<Long, Order> orders;
+  private final ExpiringMap<Long, Order> orders; // This is a ConcurrentMap.
   private final int capacity;
   private final double decayRateMultiplier;
 
