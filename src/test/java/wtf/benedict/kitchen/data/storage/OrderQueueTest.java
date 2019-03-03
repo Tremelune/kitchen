@@ -2,15 +2,15 @@ package wtf.benedict.kitchen.data.storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static wtf.benedict.kitchen.data.Temperature.HOT;
 
-import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
 import lombok.val;
+import net.jodah.expiringmap.ExpirationListener;
 import wtf.benedict.kitchen.biz.CumulativeDecayStrategy;
 import wtf.benedict.kitchen.data.Order;
 import wtf.benedict.kitchen.test.TestUtil;
@@ -80,18 +80,26 @@ public class OrderQueueTest {
 
   @Test
   public void expiration() throws Exception {
+    val listener = new Listener();
+
     val fresh = newOrder(10, 2);
     val stale = newOrder(11, 1);
 
-    val underTest = new OrderQueue(2, 1, (id, order) -> {});
+    val underTest = new OrderQueue(2, 1, listener);
     underTest.put(stale);
     underTest.put(fresh);
 
-    // PassiveExpiringMap uses the system time, so we gotta wait in real life.
     assertEquals(stale, underTest.peekStalest());
-    Thread.sleep(1000);
+
+    // PassiveExpiringMap uses the system time, so we gotta wait in real life.
+    while(listener.expiredIds.size() < 1) {
+      Thread.sleep(100);
+    }
     assertEquals(fresh, underTest.peekStalest());
-    Thread.sleep(1000);
+
+    while(listener.expiredIds.size() < 2) {
+      Thread.sleep(100);
+    }
     assertNull(underTest.peekStalest());
   }
 
@@ -103,17 +111,17 @@ public class OrderQueueTest {
         .temp(HOT)
         .baseDecayRate(1)
         .initialShelfLife(initialShelfLife)
-        .decayStrategy(new CumulativeDecayStrategy(newClock()))
+        .decayStrategy(new CumulativeDecayStrategy(TestUtil.clock(2019, 1, 1, 0, 0, 0)))
         .build();
   }
 
 
-  private static Clock newClock() {
-    val one = TestUtil.instant(2019, 1, 1, 0, 0, 0);
-    val two = TestUtil.instant(2019, 1, 1, 0, 0, 1);
+  private static class Listener implements ExpirationListener<Long, Order> {
+    private final List<Long> expiredIds = new ArrayList<>();
 
-    val clock = mock(Clock.class);
-    when(clock.instant()).thenReturn(one, two);
-    return clock;
+    @Override
+    public void expired(Long key, Order value) {
+      expiredIds.add(key);
+    }
   }
 }
