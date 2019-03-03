@@ -1,8 +1,8 @@
 package wtf.benedict.kitchen.app;
 
 import static wtf.benedict.kitchen.app.KitchenConfig.DECAY_RATE;
-import static wtf.benedict.kitchen.app.KitchenConfig.DRIVER_DELAY_MAX;
-import static wtf.benedict.kitchen.app.KitchenConfig.DRIVER_DELAY_MIN;
+import static wtf.benedict.kitchen.app.KitchenConfig.DRIVER_DELAY_MAX_SECONDS;
+import static wtf.benedict.kitchen.app.KitchenConfig.DRIVER_DELAY_MIN_SECONDS;
 import static wtf.benedict.kitchen.app.KitchenConfig.OVERFLOW_CAPACITY;
 import static wtf.benedict.kitchen.app.KitchenConfig.OVERFLOW_DECAY_RATE;
 import static wtf.benedict.kitchen.app.KitchenConfig.SHELF_CAPACITY;
@@ -39,7 +39,7 @@ class DependencyManager {
   DependencyManager() {
     val clock = Clock.systemUTC();
     val driverStorage = new DriverStorage();
-    val driverDepot = new DriverDepot(clock, driverStorage, DRIVER_DELAY_MIN, DRIVER_DELAY_MAX);
+    val driverDepot = new DriverDepot(clock, driverStorage, DRIVER_DELAY_MIN_SECONDS, DRIVER_DELAY_MAX_SECONDS);
     val trashStorage = new TrashStorage();
     val trash = new Trash(driverStorage, trashStorage);
     val orderExpirer = new OrderExpirer(driverStorage, trash);
