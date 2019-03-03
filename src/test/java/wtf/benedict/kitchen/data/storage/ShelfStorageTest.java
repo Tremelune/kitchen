@@ -106,8 +106,8 @@ public class ShelfStorageTest {
     underTest.put(a);
     underTest.put(b);
     assertSize(2, underTest.getAll());
-    assertEquals(a, underTest.getAll().get(0));
-    assertEquals(b, underTest.getAll().get(1));
+    assertEquals(a, underTest.getAll().stream().filter((order) -> order.getId() == 10).findFirst().get());
+    assertEquals(b, underTest.getAll().stream().filter((order) -> order.getId() == 11).findFirst().get());
     assertEquals(a, underTest.getAll(HOT).get(0));
     assertEquals(b, underTest.getAll(COLD).get(0));
   }
