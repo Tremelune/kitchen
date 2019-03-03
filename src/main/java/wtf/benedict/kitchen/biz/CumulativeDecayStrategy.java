@@ -98,16 +98,29 @@ public class CumulativeDecayStrategy implements DecayStrategy {
         first = false;
       }
 
-      val decayDuration = Duration.between(change.start, end).getSeconds();
-      if (decayDuration < 0) {
-        throw new IllegalArgumentException("Time is a directed arrow!");
-      }
-
-      decayDepletion += decayDuration * decayRate;
+      decayDepletion += calculateDecayDepletion(change.start, end, decayRate);
 
       // Set the previous end time to the next start time.
       end = change.start;
     }
+
+    return calculateRemainingShelfLife(
+        initialShelfLife, totalDuration, decayDepletion, currentDecayRate);
+  }
+
+
+  // Visible for testing
+  static double calculateDecayDepletion(Instant start, Instant end, double decayRate) {
+    val decayDuration = Duration.between(start, end).getSeconds();
+    if (decayDuration < 0) {
+      throw new IllegalArgumentException("Time is a directed arrow!");
+    }
+    return decayDuration * decayRate;
+  }
+
+  // Visible for testing.
+  static long calculateRemainingShelfLife(
+      long initialShelfLife, long totalDuration, double decayDepletion, double currentDecayRate) {
 
     val remainingShelfLife = initialShelfLife - totalDuration - decayDepletion;
     val remainingShelfLifeAtCurrentDecayRate = remainingShelfLife / currentDecayRate;
