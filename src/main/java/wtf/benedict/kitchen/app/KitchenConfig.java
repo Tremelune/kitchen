@@ -12,4 +12,6 @@ class KitchenConfig extends Configuration {
 
   static final int DRIVER_DELAY_MIN_SECONDS = 2;
   static final int DRIVER_DELAY_MAX_SECONDS = 10;
+
+  static final int THREAD_POOL_SIZE = 4; // Tunable for specific hardware.
 }
