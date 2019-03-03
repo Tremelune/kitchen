@@ -43,7 +43,7 @@ public class CumulativeDecayStrategy implements DecayStrategy {
 
   /**
    * This will add a change of decay rate, starting now. Previous changes are stored in a history
-   * used for calculating remainging shelf life.
+   * used for calculating remaining shelf life.
    *
    * @param rate Rate multiplier. It affects the base decay rate of an order.
    */
@@ -58,9 +58,7 @@ public class CumulativeDecayStrategy implements DecayStrategy {
    * It's handy for figuring out a shelf life before moving an order to a different shelf.
    */
   @Override
-  public long calculateRemainingShelfLifeAt(
-      double baseDecayRate, long initialShelfLife, double newDecayRate) {
-
+  public long calculateRemainingShelfLifeAt(double baseDecayRate, long initialShelfLife, double newDecayRate) {
     val remainingShelfLife = calculateRemainingShelfLife(baseDecayRate, initialShelfLife);
     val rate = newDecayRate * baseDecayRate;
     val nextLife = remainingShelfLife / rate;
@@ -104,12 +102,11 @@ public class CumulativeDecayStrategy implements DecayStrategy {
       end = change.start;
     }
 
-    return calculateRemainingShelfLife(
-        initialShelfLife, totalDuration, decayDepletion, currentDecayRate);
+    return calculateRemainingShelfLife(initialShelfLife, totalDuration, decayDepletion, currentDecayRate);
   }
 
 
-  // Visible for testing
+  // Visible for testing.
   static double calculateDecayDepletion(Instant start, Instant end, double decayRate) {
     val decayDuration = Duration.between(start, end).getSeconds();
     if (decayDuration < 0) {

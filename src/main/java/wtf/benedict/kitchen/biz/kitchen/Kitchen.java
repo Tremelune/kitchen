@@ -29,9 +29,9 @@ public class Kitchen {
   }
 
 
-  /** Pulls order from shelves by ID. */
-  Order pickupOrder(long orderId) {
-    return shelf.pull(orderId);
+  /** Removes order from shelves by ID. */
+  private void pickupOrder(long orderId) {
+    shelf.pull(orderId);
   }
 
 

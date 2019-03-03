@@ -60,7 +60,6 @@ public class OrderGenerator {
   }
 
 
-
   private long nextOrderId() {
     return id.getAndIncrement();
   }
